@@ -12,8 +12,13 @@ def grid_file_to_list(path):
 
 def find_max_space(grid):
     """
-    Найти наибольшее пространство, доступное для слова.
-    grid - list
+    Найти максимальное пустое место
+
+    Arguments:
+    grid : list
+
+    Returns:
+    resH, resV : int
     """
 
     resH = find_max_space_h(grid)
@@ -50,6 +55,18 @@ def find_max_space_h(grid):
             res = count
 
     return res
+
+
+def find_word(length):
+    """
+    Найти слово нужной длины
+
+    Arguments:
+    length : int
+
+    Returns:
+    word : string
+    """
 
 
 grid = grid_file_to_list(config.gridFilePath)
