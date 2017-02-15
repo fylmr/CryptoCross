@@ -15,6 +15,16 @@ def find_max_space(grid):
     Найти наибольшее пространство, доступное для слова.
     grid - list
     """
+
+    resH = find_max_space_h(grid)
+    gridReversed = [[j[i] for j in grid]
+                    for i in range(len(grid))]  # Transpose
+    resV = find_max_space_h(gridReversed)
+
+    return resH, resV
+
+
+def find_max_space_h(grid):
     res = 0
     # Горизонтальная проверка
     for line in grid:
@@ -22,12 +32,12 @@ def find_max_space(grid):
         # Слева направо
         count = 0
         for i in line:
-            if i == '#':
-                break
+            if i != '_':
+                if count > res:
+                    res = count
+                count = 0
             else:
                 count += 1
-        if count > res:
-            res = count
 
         # Справа налево
         count = 0
@@ -38,10 +48,6 @@ def find_max_space(grid):
                 count += 1
         if count > res:
             res = count
-
-    # Вертикальная проверка
-    for i in range(1, len(grid)):
-        pass
 
     return res
 
