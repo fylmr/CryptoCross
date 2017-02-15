@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-i = 0
-with open('dict.txt', 'r') as f:
-    with open('list.txt', 'w') as g:
+
+import codecs
+
+with codecs.open('dict.txt', 'r', "utf_8_sig") as f:
+    with codecs.open('list.txt', 'w', "utf_8_sig") as g:
         for x in f.readlines():
             x = x.rstrip()
             if not x:
