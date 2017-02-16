@@ -49,8 +49,10 @@ def find_max_space_h(grid):
         # Справа налево
         count = 0
         for i in reversed(line):
-            if i == '#':
-                break
+            if i != '_':
+                if count > res:
+                    res = count
+                count = 0
             else:
                 count += 1
         if count > res:
@@ -85,7 +87,45 @@ def find_word(wordList, length):
     return wordList[n]
 
 
+def insert_word(grid):
+    if find_max_space(grid)[0] >= find_max_space(grid)[1]:
+        pos = insert_word_h_pos(grid, find_max_space(grid)[0])
+    else:
+        pos = insert_word_h_pos(grid, find_max_space(grid)[1])
+
+
+def insert_word_h_pos(grid, length):
+    """
+    Вставить слово по горизонтали
+
+    Arguments:
+    grid : list
+    length : int
+
+    Returns:
+    row, col : int
+        Где вставлять слово
+    """
+
+    for row in range(len(grid)):
+        count = 0
+        for col in range(len(grid)):
+            print(row, col, count)
+            if count == length:
+                return row, col - length
+            else:
+                if grid[row][col] != "#":
+                    count += 1
+                else:
+                    count = 0
+
+
+def show_grid(grid):
+    for i in grid:
+        print(i)
+
+
 grid = file_to_list(config.gridFilePath)
 wordList = file_to_list(config.sortedListFilePath)
 
-print(find_word(wordList, find_max_space(grid)[1]))
+print(insert_word_h_pos(grid, 11))
