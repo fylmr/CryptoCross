@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 import config
+import random
+import codecs
 
 
-def grid_file_to_list(path):
+def file_to_list(path):
     res = []
-    with open(path) as f:
+    with codecs.open(path, 'r', "utf_8_sig") as f:
         res = f.readlines()
     res = [x.strip() for x in res]
     return res
@@ -57,18 +59,33 @@ def find_max_space_h(grid):
     return res
 
 
-def find_word(length):
+def find_word(wordList, length):
     """
     Найти слово нужной длины
 
     Arguments:
+    wordList : list
     length : int
 
     Returns:
     word : string
     """
+    step = 5
+
+    n = random.randint(0, len(wordList))
+    print(n)
+    while len(wordList[n]) != length:
+        if len(wordList[n]) > length:
+            n += step
+        else:
+            n -= step
+        if n < 0 or n > len(wordList):
+            n = random.randint(0, len(wordList))
+
+    return wordList[n]
 
 
-grid = grid_file_to_list(config.gridFilePath)
+grid = file_to_list(config.gridFilePath)
+wordList = file_to_list(config.sortedListFilePath)
 
-print(find_max_space(grid))
+print(find_word(wordList, find_max_space(grid)[1]))
