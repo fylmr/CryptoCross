@@ -33,25 +33,13 @@ def find_max_space(grid):
 
 def find_max_space_h(grid):
     res = 0
-    # Горизонтальная проверка
-    for line in grid:
 
-        # Слева направо
+    for line in grid:
         count = 0
         for i in line:
+            if count > res:
+                res = count
             if i != '_':
-                if count > res:
-                    res = count
-                count = 0
-            else:
-                count += 1
-
-        # Справа налево
-        count = 0
-        for i in reversed(line):
-            if i != '_':
-                if count > res:
-                    res = count
                 count = 0
             else:
                 count += 1
@@ -87,11 +75,29 @@ def find_word(wordList, length):
     return wordList[n]
 
 
-def insert_word(grid):
+def insert_word_pos(grid):
+    """
+    Вставить слово по горизонтали
+
+    Arguments:
+    grid : list
+
+    Returns:
+    row, col, length : int
+        Где вставлять слово
+    """
+    rev = False
     if find_max_space(grid)[0] >= find_max_space(grid)[1]:
-        pos = insert_word_h_pos(grid, find_max_space(grid)[0])
+        length = find_max_space(grid)[0]
+        pos = insert_word_h_pos(grid, length)
     else:
-        pos = insert_word_h_pos(grid, find_max_space(grid)[1])
+        gridReversed = [[j[i] for j in grid]
+                        for i in range(len(grid))]  # Transpose
+        rev = True
+
+        length = find_max_space(grid)[1]
+        pos = insert_word_h_pos(gridReversed, length)
+    return pos, rev, length
 
 
 def insert_word_h_pos(grid, length):
@@ -110,12 +116,13 @@ def insert_word_h_pos(grid, length):
     for row in range(len(grid)):
         count = 0
         for col in range(len(grid)):
-            print(row, col, count)
+            if grid[row][col] != "#":
+                count += 1
             if count == length:
-                return row, col - length
+                return row, col - length + 1
             else:
                 if grid[row][col] != "#":
-                    count += 1
+                    pass
                 else:
                     count = 0
 
@@ -128,4 +135,4 @@ def show_grid(grid):
 grid = file_to_list(config.gridFilePath)
 wordList = file_to_list(config.sortedListFilePath)
 
-print(insert_word_h_pos(grid, 11))
+print(insert_word_pos(grid))
