@@ -89,6 +89,10 @@ def insert_word_pos(grid):
     rev = False
     if find_max_space(grid)[0] >= find_max_space(grid)[1]:
         length = find_max_space(grid)[0]
+
+        if length < 2:
+            raise ValueError("Got word with length < 2")
+
         pos = insert_word_h_pos(grid, length)
     else:
         gridReversed = [[j[i] for j in grid]
@@ -133,6 +137,6 @@ def show_grid(grid):
 
 
 grid = file_to_list(config.gridFilePath)
-wordList = file_to_list(config.sortedListFilePath)
+dictList = file_to_list(config.sortedListFilePath)
 
 print(insert_word_pos(grid))
