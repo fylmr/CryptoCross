@@ -12,6 +12,11 @@ def file_to_list(path):
     return res
 
 
+def show_grid(grid):
+    for i in grid:
+        print(i)
+
+
 def find_max_space(grid):
     """
     Найти максимальное пустое место
@@ -129,11 +134,6 @@ def insert_word_h_pos(grid, length):
                     pass
                 else:
                     count = 0
-
-
-def show_grid(grid):
-    for i in grid:
-        print(i)
 
 
 grid = file_to_list(config.gridFilePath)
