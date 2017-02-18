@@ -92,10 +92,17 @@ def insert_word(grid, wordList):
     """
 
     posX = insert_word_pos(grid)[0][0]
+    # print("posx", posX)
     posY = insert_word_pos(grid)[0][1]
+    # print("posY", posY)
     rev = insert_word_pos(grid)[1]
+    # print("rev", rev)
     length = insert_word_pos(grid)[2]
+    # print("length", length)
     word = find_word(length, wordList)
+
+    print("\nInserting word in: \n")
+    show_grid(grid)
 
     if not rev:
         grid[posX] = grid[posX][:posY] + word + grid[posX][posY + length:]
@@ -150,12 +157,12 @@ def insert_word_h_pos(grid, length):
     for row in range(len(grid)):
         count = 0
         for col in range(len(grid)):
-            if grid[row][col] != "#":
+            if grid[row][col] == "_":
                 count += 1
             if count == length:
                 return row, col - length + 1
             else:
-                if grid[row][col] != "#":
+                if grid[row][col] == "_":
                     pass
                 else:
                     count = 0
@@ -164,6 +171,9 @@ def insert_word_h_pos(grid, length):
 grid = file_to_list(config.gridFilePath)
 dictList = file_to_list(config.sortedListFilePath)
 
-grid = insert_word(grid, dictList)
-
-show_grid(grid)
+try:
+    while True:
+        grid = insert_word(grid, dictList)
+except Exception:
+    print("\nGrid done: ")
+    show_grid(grid)
