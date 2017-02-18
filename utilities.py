@@ -80,7 +80,7 @@ def find_word(wordList, length):
     return wordList[n]
 
 
-def insert_word(grid, posX, posY):
+def insert_word(grid):
     """
     Вставить слово в сетку. Возвращает изменённую сетку
 
@@ -88,11 +88,25 @@ def insert_word(grid, posX, posY):
     grid : list
     posX : int
     posY : int
+    length : int
 
     Returns
     grid : list
     """
 
+    posX = insert_word_pos(grid)[0][0]
+    posY = insert_word_pos(grid)[0][1]
+    rev = insert_word_pos(grid)[1]
+    length = insert_word_pos(grid)[2]
+    word = find_word(length)
+
+    if not rev:
+        for letter in word:
+            grid[posX][posY] = letter
+            posX += 1
+            posY += 1
+
+    return grid
 
 def insert_word_pos(grid):
     """
@@ -102,7 +116,9 @@ def insert_word_pos(grid):
     grid : list
 
     Returns:
-    row, col, length : int
+    pos : int
+    rev : bool
+    length : int
         Где вставлять слово
     """
     rev = False
@@ -153,4 +169,4 @@ def insert_word_h_pos(grid, length):
 grid = file_to_list(config.gridFilePath)
 dictList = file_to_list(config.sortedListFilePath)
 
-print(insert_word_pos(grid))
+print(insert_word(grid))
