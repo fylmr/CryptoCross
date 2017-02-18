@@ -80,9 +80,23 @@ def find_word(wordList, length):
     return wordList[n]
 
 
+def insert_word(grid, posX, posY):
+    """
+    Вставить слово в сетку. Возвращает изменённую сетку
+
+    Args
+    grid : list
+    posX : int
+    posY : int
+
+    Returns
+    grid : list
+    """
+
+
 def insert_word_pos(grid):
     """
-    Вставить слово по горизонтали
+    Найти наилучшую позицию для вставки слова
 
     Arguments:
     grid : list
