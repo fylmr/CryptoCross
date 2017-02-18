@@ -54,7 +54,7 @@ def find_max_space_h(grid):
     return res
 
 
-def find_word(wordList, length):
+def find_word(length, wordList):
     """
     Найти слово нужной длины
 
@@ -68,7 +68,7 @@ def find_word(wordList, length):
     step = 5
 
     n = random.randint(0, len(wordList))
-    print(n)
+
     while len(wordList[n]) != length:
         if len(wordList[n]) > length:
             n += step
@@ -80,15 +80,12 @@ def find_word(wordList, length):
     return wordList[n]
 
 
-def insert_word(grid):
+def insert_word(grid, wordList):
     """
     Вставить слово в сетку. Возвращает изменённую сетку
 
     Args
     grid : list
-    posX : int
-    posY : int
-    length : int
 
     Returns
     grid : list
@@ -98,15 +95,13 @@ def insert_word(grid):
     posY = insert_word_pos(grid)[0][1]
     rev = insert_word_pos(grid)[1]
     length = insert_word_pos(grid)[2]
-    word = find_word(length)
+    word = find_word(length, wordList)
 
     if not rev:
-        for letter in word:
-            grid[posX][posY] = letter
-            posX += 1
-            posY += 1
+        grid[posX] = grid[posX][:posY] + word + grid[posX][posY + length:]
 
     return grid
+
 
 def insert_word_pos(grid):
     """
@@ -169,4 +164,6 @@ def insert_word_h_pos(grid, length):
 grid = file_to_list(config.gridFilePath)
 dictList = file_to_list(config.sortedListFilePath)
 
-print(insert_word(grid))
+grid = insert_word(grid, dictList)
+
+show_grid(grid)
