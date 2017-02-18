@@ -17,6 +17,15 @@ def show_grid(grid):
         print(i)
 
 
+def reverseGrid(grid):
+    gridRev = [[j[i] for j in grid]
+               for i in range(len(grid))]
+    for i in range(len(gridRev)):
+        gridRev[i] = ''.join(gridRev[i])
+
+    return gridRev
+
+
 def find_max_space(grid):
     """
     Найти максимальное пустое место
@@ -80,32 +89,42 @@ def find_word(length, wordList):
     return wordList[n]
 
 
-def insert_word(grid, wordList):
+def insert_word(grid, wordList, forceV=False, showLogs=False):
     """
     Вставить слово в сетку. Возвращает изменённую сетку
 
     Args
     grid : list
+    wordList: list
+    forceV: bool
+        Вставить по вертикали
+    showLogs: bool
+        Показывать процесс
 
     Returns
     grid : list
     """
 
     posX = insert_word_pos(grid)[0][0]
-    # print("posx", posX)
     posY = insert_word_pos(grid)[0][1]
-    # print("posY", posY)
-    rev = insert_word_pos(grid)[1]
-    # print("rev", rev)
+    rev = insert_word_pos(grid)[1] or forceV
     length = insert_word_pos(grid)[2]
-    # print("length", length)
     word = find_word(length, wordList)
 
-    print("\nInserting word in: \n")
-    show_grid(grid)
+    if showLogs:
+        print("\ninsert_word")
+        print(posX, posY, rev, length, word)
+        print("Inserting word in:")
+        show_grid(grid)
 
-    if not rev:
+    if not rev and not forceV:
         grid[posX] = grid[posX][:posY] + word + grid[posX][posY + length:]
+    else:
+        gridReversed = reverseGrid(grid)
+
+        gridReversed[posX] = gridReversed[posX][:posY] + \
+            word + gridReversed[posX][posY + length:]
+        grid = reverseGrid(gridReversed)
 
     return grid
 
@@ -118,14 +137,15 @@ def insert_word_pos(grid):
     grid : list
 
     Returns:
-    pos : int
+    pos : list of 2 ints
     rev : bool
     length : int
         Где вставлять слово
     """
-    rev = False
+
     if find_max_space(grid)[0] >= find_max_space(grid)[1]:
         length = find_max_space(grid)[0]
+        rev = False
 
         if length < 2:
             raise ValueError("Got word with length < 2")
@@ -172,8 +192,16 @@ grid = file_to_list(config.gridFilePath)
 dictList = file_to_list(config.sortedListFilePath)
 
 try:
+    i = 0
     while True:
-        grid = insert_word(grid, dictList)
-except Exception:
+        if i % 2 == 0:
+            rev = False
+        else:
+            rev = True
+            print("REV", rev)
+        grid = insert_word(grid, dictList, forceV=rev, showLogs=True)
+        i += 1
+except Exception as e:
     print("\nGrid done: ")
     show_grid(grid)
+    print(e)
