@@ -1,15 +1,18 @@
-✔ Найдём максимальное свободное место @done (17-02-16 20:51)
-✔ Расставим, как можем @done (17-02-18 16:30)
-☐ Force vertical
-☐ Если с максимальным местом плохо, начинаем пересекать слова
-☐ Для этого храним все вставленные слова в массиве
-☐ Каждый раз, находя пересечение, узнаём, что это за слово
-☐ Пытаемся сохранить созданный массив как можем
-☐ Если это не удаётся, то удаляем проблемное слово из массива
-☐ Начинаем сначала
-☐ Если цикл длится >10^9 раз, начинаем полностью заново
-
 Дополнительно:
   ☐ Добавить оценку при добавлении слова: сколько пересечний, сколько места занято
 
 Имеем пустую сетку
+Ставим в неё слова по максимально возможной длине по горизонтали 
+  вертикали?
+Берём следующее слово
+Пытаемся расположить (ok : bool) слово в кроссворде
+  Чередуем вертикаль и горизонталь
+  
+StackOverflow:
+ ✔ Sort all the words by length, descending. @done (17-02-19 19:30)
+ ✔ Take the first word and place it on the board. @done (17-02-19 19:56)
+ ✔ Take the next word. @done (17-02-19 21:38)
+ ☐ Search through all the words that are already on the board and see if there are any possible intersections (any common letters) with this word.
+ ☐ If there is a possible location for this word, loop through all the words that are on the board and check to see if the new word interferes.
+ ☐ If this word doesn't break the board, then place it there and go to step 3, otherwise, continue searching for a place (step 4).
+ ☐ Continue this loop until all the words are either placed or unable to be placed.

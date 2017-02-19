@@ -13,9 +13,13 @@ class Grid(object):
     wordList: Словарь
     """
 
+    insertedList = []  # Слово, строка, столбец, вертикаль?
+    canvas = []  # Изначальная сетка
+
     def __init__(self, grid, wordList):
         super(Grid, self).__init__()
         self.grid = grid
+        self.canvas = grid
         self.wordList = wordList
 
     def show(self):
@@ -24,6 +28,14 @@ class Grid(object):
 
         grid = self.grid
         for i in grid:
+            print(i)
+
+    def showCanvas(self):
+        """Показать изначальную сетку
+        """
+
+        canvas = self.canvas
+        for i in canvas:
             print(i)
 
     def reverse(self, grid):
@@ -36,16 +48,20 @@ class Grid(object):
 
         return gridRev
 
+    def add_word_to_insertedlist(self, word, col, row, rev):
+        self.insertedList.append([word, col, row, rev])
+
     def find_max_space(self, rev=False):
-        """Максимальное свободное место
+        """Максимальная длина места, в котором нет чёрных клеток
 
         Parameters
         ----------
-        rev=True: bool
+        rev=False: bool
             Смотреть по вертикали
         Returns
         -------
-
+        res: int
+            Максимальное место по заданному направлению
         """
 
         grid = self.grid
@@ -67,7 +83,7 @@ class Grid(object):
             for i in line:
                 if count > res:
                     res = count
-                if i != '_':
+                if i == '#':
                     count = 0
                 else:
                     count += 1
@@ -76,12 +92,13 @@ class Grid(object):
 
         return res
 
-    def find_word(self, length):
+    def get_word(self, length, step=3):
         """Найти слово нужной длины
 
         Parameters
         ----------
         length: Желаемая длина
+        step=3: Шаг поиска
 
         Returns
         -------
@@ -89,8 +106,6 @@ class Grid(object):
         """
 
         wordList = self.wordList
-
-        step = 3
 
         n = random.randint(0, len(wordList))
 
@@ -123,6 +138,11 @@ class Grid(object):
 
         length = self.find_max_space()
 
+        if rev:
+            grid = self.reverse(self.grid)
+        else:
+            grid = self.grid
+
         for row in range(len(grid)):
             count = 0
             for col in range(len(grid)):
@@ -136,10 +156,50 @@ class Grid(object):
                     else:
                         count = 0
 
+    def add_word_to_pos(self, word, row, col, rev=False):
+        """Поставить слово на позицию. Изменяет сетку
+
+        Parameters
+        ----------
+        word: Слово
+        row: Ряд
+        col: Столбец
+        rev=False: По вертикали?
+        """
+
+        if rev:
+            grid = self.reverse(self.grid)
+            row, col = col, row
+        else:
+            grid = self.grid
+
+        length = len(word)
+
+        grid[row] = grid[row][:col] + word + grid[row][col + length:]
+        # Должна быть проверка, чтоб слово не выходило за пределы экрана
+
+        if rev:
+            self.grid = self.reverse(grid)
+            row, col = col, row
+        else:
+            self.grid = grid
+
+        self.add_word_to_insertedlist(word, row, col, rev)
+
+    def common_letters_words(self, word):
+        for w in self.insertedList:
+            for letter in word:
+                if letter in w[0]:
+                    print(w)
+                    break
+
 
 grid = config.file_to_list(config.gridFilePath)
 wordList = config.file_to_list(config.sortedListFilePath)
 
 grid = Grid(grid, wordList)
 
-print(grid.max_space_pos())
+grid.add_word_to_insertedlist("привет", 0, 0, False)
+grid.add_word_to_insertedlist("пока", 0, 0, False)
+
+grid.common_letters_words("ааа")
