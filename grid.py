@@ -14,7 +14,6 @@ class Grid(object):
     """
 
     insertedList = []  # Слово, строка, столбец, вертикаль?
-    canvas = []  # Изначальная сетка
 
     def __init__(self, grid, wordList):
         super(Grid, self).__init__()
@@ -187,19 +186,28 @@ class Grid(object):
         self.add_word_to_insertedlist(word, row, col, rev)
 
     def common_letters_words(self, word):
+        """Вернёт список слов, с которыми есть пересечения в буквах,
+        в формате [слово, буква]
+
+        Parameters
+        ----------
+        word: Слово
+
+        Returns
+        -------
+        res: Список слов, с которыми есть пересечения
+        """
+
+        res = []
         for w in self.insertedList:
             for letter in word:
                 if letter in w[0]:
-                    print(w)
+                    res.append([w[0], letter])
                     break
+        return res
 
 
 grid = config.file_to_list(config.gridFilePath)
 wordList = config.file_to_list(config.sortedListFilePath)
 
 grid = Grid(grid, wordList)
-
-grid.add_word_to_insertedlist("привет", 0, 0, False)
-grid.add_word_to_insertedlist("пока", 0, 0, False)
-
-grid.common_letters_words("ааа")
