@@ -160,6 +160,30 @@ class Grid(object):
                     else:
                         count = 0
 
+    def exact_space_pos(self, length, rev=False, verbose=False):
+        grid = self.grid
+
+        if length is None:
+            length = self.find_max_space()
+
+        if rev:
+            grid = self.reverse(self.grid)
+        else:
+            grid = self.grid
+
+        for row in range(len(grid)):
+            count = 0
+            for col in range(len(grid)):
+                if grid[row][col] == "_" and col + 1 < len(grid):
+                    count += 1
+                else:
+                    if count == length:
+                        return row, col - length
+                    # if grid[row][col] == "_":
+                    #     pass
+                    else:
+                        count = 0
+
     def add_word_to_pos(self, word, row, col, rev=False):
         """Поставить слово на позицию. Изменяет сетку
 
@@ -229,7 +253,7 @@ class Grid(object):
         maxpos = self.max_space_pos(rev=maxdir)
         print("maxpos found")
 
-        self.add_word_to_insertedlist(word, maxpos[0], maxpos[1], maxdir)
+        self.add_word_to_pos(word, maxpos[0], maxpos[1], maxdir)
         print("Added first word to inserted list")
 
         print("Liftoff")
@@ -247,17 +271,19 @@ class Grid(object):
             else:
                 print("No common words found")
 
-                if self.max_space_pos(rev=False, length=len(w)):
+                if self.exact_space_pos(rev=False, length=len(w)):
                     print("Можно вставить по горизонтали")
 
-                    p = self.max_space_pos(rev=False, length=len(w))
-                    self.add_word_to_insertedlist(w, p[0], p[1], False)
+                    p = self.exact_space_pos(rev=False, length=len(w))
+                    self.add_word_to_pos(w, p[0], p[1], False)
+                    self.show()
 
-                elif self.max_space_pos(rev=True, length=len(w)):
+                elif self.exact_space_pos(rev=True, length=len(w)):
                     print("Можно вставить по вертикали")
-                    p = self.max_space_pos(rev=False, length=len(w))
+                    p = self.exact_space_pos(rev=True, length=len(w))
 
-                    self.add_word_to_insertedlist(w, p[0], p[1], False)
+                    self.add_word_to_pos(w, p[0], p[1], True)
+                    self.show()
 
             counter += 1
 
