@@ -118,49 +118,7 @@ class Grid(object):
 
         return wordList[n]
 
-    def max_space_pos(self, rev=False, verbose=False, length=None):
-        """Вернуть координаты максимально пустого места
-
-        Parameters
-        ----------
-        rev = False: bool
-            Вставить по вертикали
-        verbose = False: bool
-            Показывать процесс
-        length = None: bool
-            Если дать значение, ищет место для нужной длины,
-            если оставить — ищет максимально возможное
-        Returns
-        -------
-        row, col: int or None
-            Строка и столбец, если найдено место
-            или ничего, если места нет
-        """
-
-        grid = self.grid
-
-        if length is None:
-            length = self.find_max_space()
-
-        if rev:
-            grid = self.reverse(self.grid)
-        else:
-            grid = self.grid
-
-        for row in range(len(grid)):
-            count = 0
-            for col in range(len(grid)):
-                if grid[row][col] == "_":
-                    count += 1
-                if count == length:
-                    return row, col - length + 1
-                else:
-                    if grid[row][col] == "_":
-                        pass
-                    else:
-                        count = 0
-
-    def exact_space_pos(self, length, rev=False, verbose=False):
+    def space_pos(self, length=None, rev=False, verbose=False):
         grid = self.grid
 
         if length is None:
@@ -225,6 +183,7 @@ class Grid(object):
         Returns
         -------
         res: Список слов, с которыми есть пересечения
+            Формат: [слово, буква]
         """
 
         res = []
@@ -238,54 +197,92 @@ class Grid(object):
                     break
         return res
 
-    def create(self, verbose=False):
+    def letterPositions(self, word, letter):
+        res = []
+        for lePos in range(len(word)):
+            if word[lePos] == letter:
+                res.append(lePos)
+        return res
 
-        # Ищем максимальное место
+    def isIntersectable(self, word, commonList):
+        for intersection in commonList:
+            for interLetterPos in self.letterPositions(intersection[0],
+                                                       intersection[1]):
+                pass
+
+    def get_maxdir(self):
         if self.find_max_space(rev=False) > self.find_max_space(rev=True):
-            maxdir = False
+            return False
         else:
-            maxdir = True
+            return True
 
-        # Находим подходящее под место первое слово
+    def insert_first(self, maxdir, verbose=True):
         word = self.get_word(self.find_max_space(rev=maxdir))
-        print("Word found:", word)
-
-        maxpos = self.max_space_pos(rev=maxdir)
-        print("maxpos found")
-
+        maxpos = self.space_pos(rev=maxdir)
         self.add_word_to_pos(word, maxpos[0], maxpos[1], maxdir)
-        print("Added first word to inserted list")
 
+        if verbose:
+            print("Word found:", word)
+            print("maxpos found")
+            print("Added first word to inserted list")
+
+        return word
+
+    def creationLoop(self, firstWord, firstDir, verbose=False):
         print("Liftoff")
         counter = 0
         while True:
-            print("\nTRY", counter)
+            if verbose:
+                print("\nTRY", counter)
 
-            w = self.get_word(length=random.randint(3, len(word)))
-            common = self.common_letters_words(w, maxdir)
-            print("insertedList:", self.insertedList)
+            w = self.get_word(length=random.randint(3, len(firstWord)))
+            common = self.common_letters_words(w, firstDir)
+            if verbose:
+                print("insertedList:", self.insertedList)
 
             if len(common) > 0:
-                pass
-                print("Common words found")
+                if verbose:
+                    print("Common words found")
+
+                if self.isIntersectable(w, common):
+                    # self.intersect()
+                    pass
+
             else:
-                print("No common words found")
+                if verbose:
+                    print("No common words found")
 
-                if self.exact_space_pos(rev=False, length=len(w)):
-                    print("Можно вставить по горизонтали")
+                if self.space_pos(rev=False, length=len(w)):
+                    if verbose:
+                        print("Можно вставить по горизонтали")
 
-                    p = self.exact_space_pos(rev=False, length=len(w))
+                    p = self.space_pos(rev=False, length=len(w))
                     self.add_word_to_pos(w, p[0], p[1], False)
+
+                    print("\n")
                     self.show()
 
-                elif self.exact_space_pos(rev=True, length=len(w)):
-                    print("Можно вставить по вертикали")
-                    p = self.exact_space_pos(rev=True, length=len(w))
+                elif self.space_pos(rev=True, length=len(w)):
+                    if verbose:
+                        print("Можно вставить по вертикали")
+                    p = self.space_pos(rev=True, length=len(w))
 
                     self.add_word_to_pos(w, p[0], p[1], True)
+
+                    print("\n")
                     self.show()
 
             counter += 1
+
+    def create(self):
+        # Ищем максимальное место
+        maxdir = self.get_maxdir()
+
+        # Находим подходящее под место первое слово и ставим его
+        word = self.insert_first(maxdir)
+
+        # Ищем остальные слова
+        self.creationLoop(word, maxdir)
 
 
 grid = config.file_to_list(config.gridFilePath)
@@ -293,4 +290,5 @@ wordList = config.file_to_list(config.sortedListFilePath)
 
 grid = Grid(grid, wordList)
 
-grid.create(True)
+# grid.create_one(True)
+grid.create()

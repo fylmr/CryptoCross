@@ -1,12 +1,3 @@
-StackOverflow:
- ✔ Sort all the words by length, descending. @done (17-02-19 19:30)
- ✔ Take the first word and place it on the board. @done (17-02-19 19:56)
- ✔ Take the next word. @done (17-02-19 21:38)
- ✔ Search through all the words that are already on the board and see if there are any possible intersections (any common letters) with this word. @done (17-02-22 21:05)
- ✔ If there is a possible location for this word, loop through all the words that are on the board and check to see if the new word interferes. @done (17-02-24 20:59)
- ☐ If this word doesn't break the board, then place it there and go to step 3, otherwise, continue searching for a place (step 4).
- ☐ Continue this loop until all the words are either placed or unable to be placed.
-
 Now:
  ☐ Отмечать стартовую позицию для слова! Если она совпадает с каким-то из расставленных и его направлением — брать другое
  ✔ НЕ СТАВИТЬ НА ДОСКУ, ДЕРЖАТЬ В МАССИВЕ! Так слова удалять будет легче @done (17-02-22 20:41)
@@ -22,13 +13,14 @@ insert_word():
     ✔ Берём следующее слово @done (17-02-24 20:57)
     ✔ Есть ли пересечения? @done (17-02-24 20:57)
     Нет пересечения
-      ☐ Можем ли поставить слово на доску?
+      ✔ Можем ли поставить слово на доску? @done (17-02-24 23:43)
       Можем
-        ☐ Ставим, запускаем
-      Не можем
+        ✔ Ставим, запускаем @done (17-02-24 23:43)
+      Не можем N раз
         ☐ Берём другое слово
     Есть пересечение
-      ☐ Пытаемся поставить на доску N раз
+      ☐ Пытаемся поставить на доску
+      ☐ N раз
       Получилось?
         ☐ Запускаем снова, с другим словом
       Не получилось?
