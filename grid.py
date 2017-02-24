@@ -47,8 +47,8 @@ class Grid(object):
 
         return gridRev
 
-    def add_word_to_insertedlist(self, word, col, row, rev):
-        self.insertedList.append([word, col, row, rev])
+    def add_word_to_insertedlist(self, word, row, col, rev):
+        self.insertedList.append([word, row, col, rev])
 
     def find_max_space(self, rev=False):
         """Максимальная длина места, в котором нет чёрных клеток
@@ -118,7 +118,7 @@ class Grid(object):
 
         return wordList[n]
 
-    def max_space_pos(self, rev=False, verbose=False):
+    def max_space_pos(self, rev=False, verbose=False, length=None):
         """Вернуть координаты максимально пустого места
 
         Parameters
@@ -127,15 +127,20 @@ class Grid(object):
             Вставить по вертикали
         verbose = False: bool
             Показывать процесс
+        length = None: bool
+            Если дать значение, ищет место для нужной длины,
+            если оставить — ищет максимально возможное
         Returns
         -------
-        row, col: int
-            Строка и столбец
+        row, col: int or None
+            Строка и столбец, если найдено место
+            или ничего, если места нет
         """
 
         grid = self.grid
 
-        length = self.find_max_space()
+        if length is None:
+            length = self.find_max_space()
 
         if rev:
             grid = self.reverse(self.grid)
@@ -185,7 +190,7 @@ class Grid(object):
 
         self.add_word_to_insertedlist(word, row, col, rev)
 
-    def common_letters_words(self, word):
+    def common_letters_words(self, word, rev=False):
         """Вернёт список слов, с которыми есть пересечения в буквах,
         в формате [слово, буква]
 
@@ -202,12 +207,64 @@ class Grid(object):
         for w in self.insertedList:
             for letter in word:
                 if letter in w[0]:
+                    # if w[3] != rev:
+                    #     res.append([w[0], letter])
+                    #     break
                     res.append([w[0], letter])
                     break
         return res
+
+    def create(self, verbose=False):
+
+        # Ищем максимальное место
+        if self.find_max_space(rev=False) > self.find_max_space(rev=True):
+            maxdir = False
+        else:
+            maxdir = True
+
+        # Находим подходящее под место первое слово
+        word = self.get_word(self.find_max_space(rev=maxdir))
+        print("Word found:", word)
+
+        maxpos = self.max_space_pos(rev=maxdir)
+        print("maxpos found")
+
+        self.add_word_to_insertedlist(word, maxpos[0], maxpos[1], maxdir)
+        print("Added first word to inserted list")
+
+        print("Liftoff")
+        counter = 0
+        while True:
+            print("\nTRY", counter)
+
+            w = self.get_word(length=random.randint(3, len(word)))
+            common = self.common_letters_words(w, maxdir)
+            print("insertedList:", self.insertedList)
+
+            if len(common) > 0:
+                pass
+                print("Common words found")
+            else:
+                print("No common words found")
+
+                if self.max_space_pos(rev=False, length=len(w)):
+                    print("Можно вставить по горизонтали")
+
+                    p = self.max_space_pos(rev=False, length=len(w))
+                    self.add_word_to_insertedlist(w, p[0], p[1], False)
+
+                elif self.max_space_pos(rev=True, length=len(w)):
+                    print("Можно вставить по вертикали")
+                    p = self.max_space_pos(rev=False, length=len(w))
+
+                    self.add_word_to_insertedlist(w, p[0], p[1], False)
+
+            counter += 1
 
 
 grid = config.file_to_list(config.gridFilePath)
 wordList = config.file_to_list(config.sortedListFilePath)
 
 grid = Grid(grid, wordList)
+
+grid.create(True)

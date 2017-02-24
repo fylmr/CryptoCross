@@ -1,21 +1,36 @@
-Дополнительно:
-  ☐ Добавить оценку при добавлении слова: сколько пересечний, сколько места занято
-
-Имеем пустую сетку
-Ставим в неё слова по максимально возможной длине по горизонтали 
-  вертикали?
-Берём следующее слово
-Пытаемся расположить (ok : bool) слово в кроссворде
-  Чередуем вертикаль и горизонталь
-  
 StackOverflow:
  ✔ Sort all the words by length, descending. @done (17-02-19 19:30)
  ✔ Take the first word and place it on the board. @done (17-02-19 19:56)
- ✔ Take the next word.comm @done (17-02-19 21:38)
- ☐ Search through all the words that are already on the board and see if there are any possible intersections (any common letters) with this word.
- ☐ If there is a possible location for this word, loop through all the words that are on the board and check to see if the new word interferes.
+ ✔ Take the next word. @done (17-02-19 21:38)
+ ✔ Search through all the words that are already on the board and see if there are any possible intersections (any common letters) with this word. @done (17-02-22 21:05)
+ ✔ If there is a possible location for this word, loop through all the words that are on the board and check to see if the new word interferes. @done (17-02-24 20:59)
  ☐ If this word doesn't break the board, then place it there and go to step 3, otherwise, continue searching for a place (step 4).
  ☐ Continue this loop until all the words are either placed or unable to be placed.
 
+Now:
  ☐ Отмечать стартовую позицию для слова! Если она совпадает с каким-то из расставленных и его направлением — брать другое
- ☐ НЕ СТАВИТЬ НА ДОСКУ, ДЕРЖАТЬ В МАССИВЕ! Так слова удалять будет гораздо легче.
+ ✔ НЕ СТАВИТЬ НА ДОСКУ, ДЕРЖАТЬ В МАССИВЕ! Так слова удалять будет легче @done (17-02-22 20:41)
+
+common_letters():
+ ✔ Не запоминать, если совпадает направление @done (17-02-22 20:41)
+
+insert_word():
+  ✔ Найти максимальное слово @started(17-02-22 20:00) @done (17-02-22 20:28) @lasted(0:28)
+  ✔ Поставить на доску @done (17-02-24 13:51)
+  Начинается цикл/рекурсия
+    ✔ Берём следующее слово @done (17-02-24 20:57)
+    ✔ Есть ли пересечения? @done (17-02-24 20:57)
+    Нет пересечения
+      ☐ Можем ли поставить слово на доску?
+      Можем
+        ☐ Ставим, запускаем
+      Не можем
+        ☐ Берём другое слово
+    Есть пересечение
+      ☐ Пытаемся поставить на доску N раз
+      Получилось?
+        ☐ Запускаем снова, с другим словом
+      Не получилось?
+        ☐ Возвращаемся назад, ищем другое слово, начинаем снова
+        Если слово не нашлось M раз
+          ☐ делаем pop() последнего слова
