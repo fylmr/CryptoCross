@@ -119,6 +119,20 @@ class Grid(object):
         return wordList[n]
 
     def space_pos(self, length=None, rev=False, verbose=False):
+        """Возвращает место, в котором будет точно length свободных клеток
+
+        Parameters
+        ----------
+        length=None
+        rev=False
+        verbose=False
+
+        Returns
+        -------
+        row, col
+            Если был задан rev, возвращает col, row
+        """
+
         grid = self.grid
 
         if length is None:
@@ -132,15 +146,13 @@ class Grid(object):
         for row in range(len(grid)):
             count = 0
             for col in range(len(grid)):
-                if grid[row][col] == "_" and col + 1 < len(grid):
+                if grid[row][col] == "_":
                     count += 1
                 else:
-                    if count == length:
-                        return row, col - length
-                    # if grid[row][col] == "_":
-                    #     pass
-                    else:
-                        count = 0
+                    count = 0
+                if count == length:
+                    if col + 1 == len(grid) or grid[row][col + 1] == "#":
+                        return row, col - length + 1
 
     def add_word_to_pos(self, word, row, col, rev=False):
         """Поставить слово на позицию. Изменяет сетку
@@ -225,6 +237,8 @@ class Grid(object):
             print("Word found:", word)
             print("maxpos found")
             print("Added first word to inserted list")
+            grid.show()
+            print("\n")
 
         return word
 
@@ -274,7 +288,7 @@ class Grid(object):
 
             counter += 1
 
-    def create(self):
+    def create(self, verbose=False):
         # Ищем максимальное место
         maxdir = self.get_maxdir()
 
@@ -282,7 +296,7 @@ class Grid(object):
         word = self.insert_first(maxdir)
 
         # Ищем остальные слова
-        self.creationLoop(word, maxdir)
+        self.creationLoop(word, maxdir, verbose)
 
 
 grid = config.file_to_list(config.gridFilePath)
@@ -290,5 +304,4 @@ wordList = config.file_to_list(config.sortedListFilePath)
 
 grid = Grid(grid, wordList)
 
-# grid.create_one(True)
-grid.create()
+grid.create(verbose=False)
