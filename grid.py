@@ -106,7 +106,7 @@ class Grid(object):
 
         wordList = self.wordList
 
-        n = random.randint(0, len(wordList))
+        n = random.randint(0, len(wordList) - 1)
 
         while len(wordList[n]) != length:
             if len(wordList[n]) > length:
@@ -152,7 +152,16 @@ class Grid(object):
                     count = 0
                 if count == length:
                     if col + 1 == len(grid) or grid[row][col + 1] == "#":
-                        return row, col - length + 1
+                        if not rev:
+                            return row, col - length + 1
+                        if rev:
+                            row, col = row, col - length + 1
+                            row, col = col, row
+                            return row, col
+
+    def updateGrid(self):
+        for w in self.insertedList:
+            self.add_word_to_pos(w[0], w[1], w[2], w[3])
 
     def add_word_to_pos(self, word, row, col, rev=False):
         """Поставить слово на позицию. Изменяет сетку
@@ -209,18 +218,76 @@ class Grid(object):
                     break
         return res
 
-    def letterPositions(self, word, letter):
+    def letterPositions(self, word, letter, once=True):
+        """Позиции буквы в слове
+        """
         res = []
-        for lePos in range(len(word)):
-            if word[lePos] == letter:
-                res.append(lePos)
+        for letPos in range(len(word)):
+            if word[letPos] == letter:
+                res.append(letPos)
+                if once:
+                    return letPos
         return res
 
-    def isIntersectable(self, word, commonList):
-        for intersection in commonList:
-            for interLetterPos in self.letterPositions(intersection[0],
-                                                       intersection[1]):
-                pass
+    def getDir(self, word):
+        """Получить направление вставленного слова
+        """
+        for elem in self.insertedList:
+            if elem[0] == word:
+                return elem[3]
+
+    # def isIntersectable(self, word, commonList):
+    #     for intersection in commonList:
+    #         for interLetterPos in self.letterPositions(intersection[0],
+    #                                                    intersection[1]):
+    #             pass
+
+    # def intersect(self, word, commonList):
+    #     grid = self.grid
+
+    #     if rev:
+    #         grid = self.reverse(self.grid)
+    #     else:
+    #         grid = self.grid
+
+    #     for row in range(len(grid)):
+    #         count = 0
+    #         for col in range(len(grid)):
+    #             if grid[row][col] == "_":
+    #                 count += 1
+    #             else:
+    #                 count = 0
+    #             if count == length:
+    #                 if col + 1 == len(grid) or grid[row][col + 1] == "#":
+    #                     if not rev:
+    #                         return row, col - length + 1
+    #                     if rev:
+    #                         row, col = row, col - length + 1
+    #                         row, col = col, row
+    #                         return row, col
+
+    def is_placeable(self, word, row, col, rev):
+        """Можно ли разместить тут слово?
+        Выведет False, если слово помешает другому или встретит чёрную клетку
+        Выведет True, если слово попадает в нужную букву
+            или не пересекает слов вообще
+        """
+        if rev:
+            grid = self.reverse(self.grid)
+            row, col = col, row
+        else:
+            grid = self.grid
+
+        if len(word) + col > len(grid):
+            return False
+
+        for i in range(col, col + len(word)):
+            if grid[row][i] == "#":
+                return False
+            if grid[row][i] != word[i - col] and grid[row][i] != "_":
+                return False
+
+        return True
 
     def get_maxdir(self):
         if self.find_max_space(rev=False) > self.find_max_space(rev=True):
@@ -266,22 +333,22 @@ class Grid(object):
                 if verbose:
                     print("No common words found")
 
-                if self.space_pos(rev=False, length=len(w)):
+                if self.space_pos(rev=True, length=len(w)):
                     if verbose:
                         print("Можно вставить по горизонтали")
 
-                    p = self.space_pos(rev=False, length=len(w))
-                    self.add_word_to_pos(w, p[0], p[1], False)
+                    p = self.space_pos(rev=True, length=len(w))
+                    self.add_word_to_pos(w, p[0], p[1], True)
 
                     print("\n")
                     self.show()
 
-                elif self.space_pos(rev=True, length=len(w)):
+                elif self.space_pos(rev=False, length=len(w)):
                     if verbose:
                         print("Можно вставить по вертикали")
-                    p = self.space_pos(rev=True, length=len(w))
 
-                    self.add_word_to_pos(w, p[0], p[1], True)
+                    p = self.space_pos(rev=False, length=len(w))
+                    self.add_word_to_pos(w, p[0], p[1], False)
 
                     print("\n")
                     self.show()
@@ -304,4 +371,4 @@ wordList = config.file_to_list(config.sortedListFilePath)
 
 grid = Grid(grid, wordList)
 
-grid.create(verbose=False)
+# grid.create(verbose=False)
