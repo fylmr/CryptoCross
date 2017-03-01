@@ -118,14 +118,16 @@ class Grid(object):
 
         return wordList[n]
 
-    def space_pos(self, length=None, rev=False, verbose=False):
+    def space_pos(self, length=None, rev=False, verbose=False, inter=False):
         """Возвращает место, в котором будет точно length свободных клеток
+        Или места, если нужно inter=True
 
         Parameters
         ----------
         length=None
         rev=False
         verbose=False
+        inter=False
 
         Returns
         -------
@@ -134,6 +136,8 @@ class Grid(object):
         """
 
         grid = self.grid
+        if inter:
+            res = []
 
         if length is None:
             length = self.find_max_space()
@@ -146,18 +150,34 @@ class Grid(object):
         for row in range(len(grid)):
             count = 0
             for col in range(len(grid)):
-                if grid[row][col] == "_":
-                    count += 1
+                if inter:
+                    if grid[row][col] != "_":
+                        count += 1
+                    else:
+                        count = 0
+                    if count == length:
+                        if col + 1 == len(grid) or grid[row][col + 1] == "#":
+                            if not rev:
+                                res.append([row, col - length + 1])
+                            if rev:
+                                row, col = row, col - length + 1
+                                row, col = col, row
+                                res.append([row, col])
                 else:
-                    count = 0
-                if count == length:
-                    if col + 1 == len(grid) or grid[row][col + 1] == "#":
-                        if not rev:
-                            return row, col - length + 1
-                        if rev:
-                            row, col = row, col - length + 1
-                            row, col = col, row
-                            return row, col
+                    if grid[row][col] == "_":
+                        count += 1
+                    else:
+                        count = 0
+                    if count == length:
+                        if col + 1 == len(grid) or grid[row][col + 1] == "#":
+                            if not rev:
+                                return row, col - length + 1
+                            if rev:
+                                row, col = row, col - length + 1
+                                row, col = col, row
+                                return row, col
+        if inter:
+            return res
 
     def updateGrid(self):
         for w in self.insertedList:
@@ -218,7 +238,7 @@ class Grid(object):
                     break
         return res
 
-    def letterPositions(self, word, letter, once=True):
+    def letterPositions(self, word, letter, once=False):
         """Позиции буквы в слове
         """
         res = []
@@ -227,44 +247,53 @@ class Grid(object):
                 res.append(letPos)
                 if once:
                     return letPos
+
         return res
 
-    def getDir(self, word):
+    def get_dir(self, word):
         """Получить направление вставленного слова
         """
         for elem in self.insertedList:
             if elem[0] == word:
                 return elem[3]
 
-    # def isIntersectable(self, word, commonList):
-    #     for intersection in commonList:
-    #         for interLetterPos in self.letterPositions(intersection[0],
-    #                                                    intersection[1]):
-    #             pass
+    def get_info(self, word):
+        """Получить слово, координаты и направление
+        """
+        for elem in self.insertedList:
+            if elem[0] == word:
+                return elem
 
-    # def intersect(self, word, commonList):
-    #     grid = self.grid
+    def to_intersect(self, word, commonList):
+        """Получить координаты для расположения слов, которые пересекают
+        стоящие на доске
+        """
+        res = []
 
-    #     if rev:
-    #         grid = self.reverse(self.grid)
-    #     else:
-    #         grid = self.grid
+        for inter in commonList:
+            # inter[0], inter[1] — слово и буква
+            for interLetterPos in self.letterPositions(inter[0],
+                                                       inter[1]):
+                # print("!", word, inter, interLetterPos,
+                      # self.letterPositions(word, inter[1], once=True))
+                # print("!!", self.get_info(inter[0]))
+                info = self.get_info(inter[0])
+                rev = not self.get_dir(inter[0])
+                if rev:
+                    row = info[1] - self.letterPositions(word, inter[1], True)
+                    col = info[2] + interLetterPos
+                else:
+                    row = info[1] + interLetterPos
+                    col = info[2] - self.letterPositions(word, inter[1], True)
 
-    #     for row in range(len(grid)):
-    #         count = 0
-    #         for col in range(len(grid)):
-    #             if grid[row][col] == "_":
-    #                 count += 1
-    #             else:
-    #                 count = 0
-    #             if count == length:
-    #                 if col + 1 == len(grid) or grid[row][col + 1] == "#":
-    #                     if not rev:
-    #                         return row, col - length + 1
-    #                     if rev:
-    #                         row, col = row, col - length + 1
-    #                         row, col = col, row
-    #                         return row, col
+                if self.is_placeable(word, row, col, rev):
+                    print(row, col)
+                    print(self.space_pos(len(word), rev, inter=True))
+                    if [row, col] in self.space_pos(len(word), rev,
+                                                    inter=True):
+                        res.append([row, col, rev])
+
+        return res
 
     def is_placeable(self, word, row, col, rev):
         """Можно ли разместить тут слово?
@@ -325,9 +354,12 @@ class Grid(object):
                 if verbose:
                     print("Common words found")
 
-                if self.isIntersectable(w, common):
-                    # self.intersect()
-                    pass
+                places = self.to_intersect(w, common)
+                print(places)
+                # Места, в которые можно поместить слово.
+                if len(places) > 0:
+                    self.add_word_to_pos(w, places[0], places[1], places[2])
+                    self.show()
 
             else:
                 if verbose:
@@ -371,4 +403,4 @@ wordList = config.file_to_list(config.sortedListFilePath)
 
 grid = Grid(grid, wordList)
 
-# grid.create(verbose=False)
+grid.create(verbose=False)
