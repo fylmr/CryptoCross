@@ -359,33 +359,37 @@ class Grid(object):
                 # Места, в которые можно поместить слово.
                 if len(places) > 0:
                     self.add_word_to_pos(w, places[0], places[1], places[2])
+                    continue
                     self.show()
 
-            else:
+            if verbose:
+                print("No common words found")
+
+            if self.space_pos(rev=True, length=len(w)):
                 if verbose:
-                    print("No common words found")
+                    print("Можно вставить по горизонтали")
 
-                if self.space_pos(rev=True, length=len(w)):
-                    if verbose:
-                        print("Можно вставить по горизонтали")
+                p = self.space_pos(rev=True, length=len(w))
+                self.add_word_to_pos(w, p[0], p[1], True)
 
-                    p = self.space_pos(rev=True, length=len(w))
-                    self.add_word_to_pos(w, p[0], p[1], True)
+                print("\n")
+                self.show()
 
-                    print("\n")
-                    self.show()
+            elif self.space_pos(rev=False, length=len(w)):
+                if verbose:
+                    print("Можно вставить по вертикали")
 
-                elif self.space_pos(rev=False, length=len(w)):
-                    if verbose:
-                        print("Можно вставить по вертикали")
+                p = self.space_pos(rev=False, length=len(w))
+                self.add_word_to_pos(w, p[0], p[1], False)
 
-                    p = self.space_pos(rev=False, length=len(w))
-                    self.add_word_to_pos(w, p[0], p[1], False)
-
-                    print("\n")
-                    self.show()
+                print("\n")
+                self.show()
 
             counter += 1
+            if counter % 1000 == 0:
+                self.show()
+                print(self.insertedList)
+                input()
 
     def create(self, verbose=False):
         # Ищем максимальное место
