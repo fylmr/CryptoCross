@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import config
 import words
+import logging
 
 d = words.Words()
 
@@ -15,10 +16,14 @@ class Grid(object):
 
     insertedList = []  # Слово, строка, столбец, верт/гориз
 
-    def __init__(self, grid):
+    def __init__(self, grid, verbose=logging.CRITICAL):
         super(Grid, self).__init__()
         self.grid = grid
         self.canvas = grid
+
+        logging.basicConfig(
+            format=u'[%(lineno)d:%(levelname)s]: %(message)s',
+            level=verbose)
 
     def show_canvas(self):
         """Показать изначальную сетку"""
@@ -35,6 +40,8 @@ class Grid(object):
             print(i)
 
     def cell(self, row, col):
+        """Что стоит в клетке?"""
+
         return self.grid[row][col]
 
     def reverse(self, grid):
@@ -65,5 +72,63 @@ class Grid(object):
             if elem[0] == word:
                 return elem
 
+    def count_free_space(self, row, col, rev=False):
+        pass
 
-grid = Grid(config.file_to_list(config.rgridFilePath))
+    def is_placeable(self, word, row, col, rev):
+        """Можно ли разместить слово, начиная с этой позиции
+
+        Выведет False, если слово помешает другому или встретит чёрную клетку
+        Выведет True, если слово попадает в нужную букву
+            или не пересекает слов вообще
+        """
+
+        cell = self.cell
+        firstCell = cell(row, col)
+
+        logging.debug('is_placeable: ' + word)
+
+        # Можно ли начать здесь слово по условию?
+        if firstCell == "_" or firstCell == "#":
+            logging.debug('firstCell == "_" or firstCell == "#"')
+            return False
+
+        if rev:
+            # Можно ли поставить слово в таком направлении?
+            if firstCell == "0":
+                logging.debug('firstCell == "0"')
+                return False
+
+            grid = self.reverse(self.grid)
+            row, col = col, row
+        else:
+            # Можно ли поставить слово в таком направлении?
+            if firstCell == "1":
+                logging.debug('firstCell == "1"')
+                return False
+
+            grid = self.grid
+
+        # Не слишком ли слово длинное?
+        if len(word) + col > len(grid):
+            logging.debug('len(word) + col > len(grid)')
+            return False
+
+        for i in range(col, col + len(word)):
+            if cell(row, i) == "#":
+                logging.debug('cell(row, i) == "#"')
+                return False
+            if cell(row, i) != word[i - col] and cell(row, i) != "_":
+                if cell(row, i) in ['0', '1', '2']:
+                    logging.debug("cell(row, i) in ['0', '1', '2']")
+                    continue
+                logging.debug(
+                    'cell(row, i) != word[i - col] and cell(row, i) != "_"')
+                return False
+
+        logging.info(word + ' is placeable at ' + str(row) + ', ' + str(col))
+        return True
+
+
+grid = Grid(config.file_to_list(config.rgridFilePath), logging.DEBUG)
+print(grid.is_placeable("ПРИВЕ", 0, 0, False))

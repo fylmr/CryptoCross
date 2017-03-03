@@ -62,7 +62,7 @@ class Words(object):
                     break
         return res
 
-    def letterPositions(self, word, letter, once=False):
+    def letter_positions(self, word, letter, once=False):
         """Вернёт позиции, на которых данная буква находится в слове
         """
         res = []
