@@ -274,9 +274,6 @@ class Grid(object):
             # inter[0], inter[1] — слово и буква
             for interLetterPos in self.letterPositions(inter[0],
                                                        inter[1]):
-                # print("!", word, inter, interLetterPos,
-                      # self.letterPositions(word, inter[1], once=True))
-                # print("!!", self.get_info(inter[0]))
                 info = self.get_info(inter[0])
                 rev = not self.get_dir(inter[0])
                 if rev:

@@ -2,6 +2,7 @@
 import codecs
 
 gridFilePath = "grid.txt"
+rgridFilePath = "rgrid.txt"
 
 listFilePath = "list.txt"
 sortedListFilePath = "listsorted.txt"
