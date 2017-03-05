@@ -107,11 +107,10 @@ class Grid(object):
         Выведет True, если слово попадает в нужную букву
             или не пересекает слов вообще
         """
+        logging.debug('is_placeable: {0}'.format(word))
 
         cell = self.cell
         firstCell = cell(row, col)
-
-        logging.debug('is_placeable: ' + word)
 
         # Можно ли начать здесь слово по условию?
         if firstCell == "_" or firstCell == "#":
@@ -124,7 +123,7 @@ class Grid(object):
                 logging.debug('firstCell == "0"')
                 return False
 
-            # grid = self.reverse(self.grid)
+            grid = self.reverse(self.grid)
             row, col = col, row
         else:
             # Можно ли поставить слово в таком направлении?
@@ -132,12 +131,12 @@ class Grid(object):
                 logging.debug('firstCell == "1"')
                 return False
 
-            # grid = self.grid
+            grid = self.grid
 
-        # # Не слишком ли слово длинное?
-        # if len(word) + col > len(grid):
-        #     logging.debug('len(word) + col > len(grid)')
-        #     return False
+        # Не слишком ли слово длинное?
+        if len(word) + col > len(grid):
+            logging.debug('len(word) + col > len(grid)')
+            return False
 
         if self.count_free_space(row, col, rev) != len(word):
             return False
@@ -157,4 +156,7 @@ class Grid(object):
 
 
 grid = Grid(config.file_to_list(config.rgridFilePath), logging.INFO)
-grid.is_placeable("ПРИВЕТ", 6, 0, True)
+for i in range(len(grid.grid)):
+    for j in range(len(grid.grid)):
+        grid.is_placeable("мама", i, j, False)
+        grid.is_placeable("мама", i, j, True)
