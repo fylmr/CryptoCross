@@ -73,7 +73,32 @@ class Grid(object):
                 return elem
 
     def count_free_space(self, row, col, rev=False):
-        pass
+        """Сколько, начиная с данной клетки, места до границы или конца строки
+        """
+        logging.debug("count_free_space at {0} {1} {2}".format(row, col, rev))
+
+        cell = self.cell
+
+        if rev:
+            grid = self.reverse(self.grid)
+            row, col = col, row
+        else:
+            grid = self.grid
+
+        i = col
+        while i < len(grid):
+            if rev:
+                if cell(i, row) != "#":
+                    i += 1
+                else:
+                    break
+            else:
+                if cell(row, i) != "#":
+                    i += 1
+                else:
+                    break
+            logging.debug("going through col #" + str(i))
+        return i - col
 
     def is_placeable(self, word, row, col, rev):
         """Можно ли разместить слово, начиная с этой позиции
@@ -99,7 +124,7 @@ class Grid(object):
                 logging.debug('firstCell == "0"')
                 return False
 
-            grid = self.reverse(self.grid)
+            # grid = self.reverse(self.grid)
             row, col = col, row
         else:
             # Можно ли поставить слово в таком направлении?
@@ -107,28 +132,29 @@ class Grid(object):
                 logging.debug('firstCell == "1"')
                 return False
 
-            grid = self.grid
+            # grid = self.grid
 
-        # Не слишком ли слово длинное?
-        if len(word) + col > len(grid):
-            logging.debug('len(word) + col > len(grid)')
+        # # Не слишком ли слово длинное?
+        # if len(word) + col > len(grid):
+        #     logging.debug('len(word) + col > len(grid)')
+        #     return False
+
+        if self.count_free_space(row, col, rev) != len(word):
             return False
 
+        logging.debug("is_placeable loop")
         for i in range(col, col + len(word)):
             if cell(row, i) == "#":
-                logging.debug('cell(row, i) == "#"')
                 return False
             if cell(row, i) != word[i - col] and cell(row, i) != "_":
                 if cell(row, i) in ['0', '1', '2']:
-                    logging.debug("cell(row, i) in ['0', '1', '2']")
                     continue
-                logging.debug(
-                    'cell(row, i) != word[i - col] and cell(row, i) != "_"')
                 return False
 
-        logging.info(word + ' is placeable at ' + str(row) + ', ' + str(col))
+        logging.info('{} is placeable at {}, {} {}'.format(
+            word, row, col, rev))
         return True
 
 
-grid = Grid(config.file_to_list(config.rgridFilePath), logging.DEBUG)
-print(grid.is_placeable("ПРИВЕ", 0, 0, False))
+grid = Grid(config.file_to_list(config.rgridFilePath), logging.INFO)
+grid.is_placeable("ПРИВЕТ", 6, 0, True)
