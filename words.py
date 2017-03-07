@@ -10,7 +10,7 @@ class Words(object):
         super(Words, self).__init__()
         self.wordList = config.file_to_list(config.sortedListFilePath)
 
-    def get_word(self, length, step=3):
+    def get_word(self, length, step=1):
         """Найти слово нужной длины
 
         Parameters

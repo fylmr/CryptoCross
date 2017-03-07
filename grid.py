@@ -2,6 +2,7 @@
 import config
 import words
 import logging
+import random
 
 d = words.Words()
 
@@ -57,6 +58,7 @@ class Grid(object):
     def add_word_to_inserted(self, word, row, col, rev):
         """Добавить слово в insertedList"""
 
+        logging.debug("{} added to inserted".format(word))
         self.insertedList.append([word, row, col, rev])
 
     def update_grid(self):
@@ -71,6 +73,45 @@ class Grid(object):
         for elem in self.insertedList:
             if elem[0] == word:
                 return elem
+
+    def is_on_board(self, word):
+        """Стоит ли слово уже на доске"""
+        if self.word_info(word) is not None:
+            return True
+        else:
+            return False
+
+    def add_word_to_pos(self, word, row, col, rev=False):
+        """Поставить слово на позицию. Изменяет сетку
+
+        Parameters
+        ----------
+        word: Слово
+        row: Ряд
+        col: Столбец
+        rev=False: По вертикали?
+        """
+
+        logging.debug("{} added to pos {} {} {}".format(word, row, col, rev))
+
+        if rev:
+            grid = self.reverse(self.grid)
+            row, col = col, row
+        else:
+            grid = self.grid
+
+        length = len(word)
+
+        grid[row] = grid[row][:col] + word + grid[row][col + length:]
+        # Должна быть проверка, чтоб слово не выходило за пределы экрана
+
+        if rev:
+            self.grid = self.reverse(grid)
+            row, col = col, row
+        else:
+            self.grid = grid
+
+        self.add_word_to_inserted(word, row, col, rev)
 
     def count_free_space(self, row, col, rev=False):
         """Сколько, начиная с данной клетки, места до границы или конца строки
@@ -110,7 +151,7 @@ class Grid(object):
         logging.debug('is_placeable: {0}'.format(word))
 
         cell = self.cell
-        firstCell = cell(row, col)
+        firstCell = self.canvas[row][col]
 
         # Можно ли начать здесь слово по условию?
         if firstCell == "_" or firstCell == "#":
@@ -138,25 +179,28 @@ class Grid(object):
             logging.debug('len(word) + col > len(grid)')
             return False
 
+        # Нужной ли слово длины?
         if self.count_free_space(row, col, rev) != len(word):
             return False
 
+        # Вписывается ли слово?
         logging.debug("is_placeable loop")
         for i in range(col, col + len(word)):
-            if cell(row, i) == "#":
+            if grid[row][i] == "#":
                 return False
-            if cell(row, i) != word[i - col] and cell(row, i) != "_":
-                if cell(row, i) in ['0', '1', '2']:
+            if grid[row][i] != word[i - col] and grid[row][i] != "_":
+                if grid[row][i] in ['0', '1', '2']:
                     continue
+                logging.debug("Not good at {} {} {}".format(row, i, rev))
                 return False
+
+        if self.is_on_board(word):
+            logging.debug("{} is already set".format(word))
+            return False
 
         logging.info('{} is placeable at {}, {} {}'.format(
             word, row, col, rev))
         return True
 
 
-grid = Grid(config.file_to_list(config.rgridFilePath), logging.INFO)
-for i in range(len(grid.grid)):
-    for j in range(len(grid.grid)):
-        grid.is_placeable("мама", i, j, False)
-        grid.is_placeable("мама", i, j, True)
+grid = Grid(config.file_to_list(config.rgridFilePath), logging.DEBUG)
