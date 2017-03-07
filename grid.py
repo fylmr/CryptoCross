@@ -2,7 +2,6 @@
 import config
 import words
 import logging
-import random
 
 d = words.Words()
 
@@ -150,7 +149,6 @@ class Grid(object):
         """
         logging.debug('is_placeable: {0}'.format(word))
 
-        cell = self.cell
         firstCell = self.canvas[row][col]
 
         # Можно ли начать здесь слово по условию?
@@ -180,8 +178,12 @@ class Grid(object):
             return False
 
         # Нужной ли слово длины?
-        if self.count_free_space(row, col, rev) != len(word):
-            return False
+        if rev:
+            if self.count_free_space(col, row, rev) != len(word):
+                return False
+        else:
+            if self.count_free_space(row, col, rev) != len(word):
+                return False
 
         # Вписывается ли слово?
         logging.debug("is_placeable loop")
@@ -202,5 +204,16 @@ class Grid(object):
             word, row, col, rev))
         return True
 
+    def creation(self, length=3):
+        w = d.get_word(length, step=3)
+        for i in range(3, len(self.grid)):
+            for j in range(3, len(self.grid)):
+                if self.is_placeable(w, i, j, True):
+                    self.add_word_to_pos(w, i, j, True)
 
-grid = Grid(config.file_to_list(config.rgridFilePath), logging.DEBUG)
+
+grid = Grid(config.file_to_list(config.rgridFilePath), logging.INFO)
+
+grid.creation(3)
+
+grid.show()
