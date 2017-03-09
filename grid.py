@@ -80,6 +80,58 @@ class Grid(object):
         else:
             return False
 
+    def is_dir_okay(self, word, row, col, rev):
+        """Стоит ли уже слово в том же направлении?
+        """
+        logging.debug("is dir okay for {} {} {} {}".format(
+            word, row, col, rev))
+
+        sameRev = []
+        for elem in self.insertedList:
+            if elem[3] == rev:
+                sameRev.append(elem)
+
+        logging.debug("sameRev filled")
+
+        # Если на доске ещё ничего нет в том же направлении, всё в порядке
+        if len(sameRev) == 0:
+            logging.debug("sameRev is empty")
+            return True
+
+        # Пустить, только если слово стоит не раньше,
+        # чем начинается другое
+        if not rev:
+            for elem in sameRev:
+                # Если строка не совпадает, идти дальше
+                if row != elem[1]:
+                    logging.debug("row {} != {}".format(row, elem[1]))
+                    continue
+                if col > elem[2]:
+                    if elem[2] + len(elem[0]) > col:
+                        logging.debug("elem[2] + len > col")
+                        return False
+                else:
+                    if col + len(word) > elem[2]:
+                        logging.debug("col + len(w) > elem[2]")
+                        return False
+        else:
+            for elem in sameRev:
+                # Если столбец не совпадает, идти дальше
+                if col != elem[2]:
+                    logging.debug("col {} != {}".format(col, elem[2]))
+                    continue
+                if row > elem[1]:
+                    if elem[1] + len(elem[0]) > row:
+                        logging.debug("elem[1] + len(elem[0]) > row")
+                        return False
+                else:
+                    if row + len(word) > elem[1]:
+                        logging.debug("row + len(word) > elem[1]")
+                        return False
+
+        logging.info("dir okay for {}".format(word))
+        return True
+
     def add_word_to_pos(self, word, row, col, rev=False):
         """Поставить слово на позицию. Изменяет сетку
 
@@ -147,7 +199,7 @@ class Grid(object):
         Выведет True, если слово попадает в нужную букву
             или не пересекает слов вообще
         """
-        logging.debug('is_placeable: {0}'.format(word))
+        logging.debug('is_placeable: {}'.format(word))
 
         firstCell = self.canvas[row][col]
 
@@ -206,14 +258,15 @@ class Grid(object):
 
     def creation(self, length=3):
         w = d.get_word(length, step=3)
-        for i in range(3, len(self.grid)):
-            for j in range(3, len(self.grid)):
-                if self.is_placeable(w, i, j, True):
-                    self.add_word_to_pos(w, i, j, True)
+        for i in range(0, len(self.grid)):
+            for j in range(0, len(self.grid)):
+                logging.debug("{} {}".format(i, j))
+                if self.is_placeable(w, i, j, False):
+                    self.add_word_to_pos(w, i, j, False)
 
 
-grid = Grid(config.file_to_list(config.rgridFilePath), logging.INFO)
+grid = Grid(config.file_to_list(config.rgridFilePath), logging.DEBUG)
 
-grid.creation(3)
+grid.creation(11)
 
 grid.show()
