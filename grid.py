@@ -62,8 +62,11 @@ class Grid(object):
 
     def update_grid(self):
         """Заново отрисовать сетку по insertedList"""
+        iList = self.insertedList[:]
 
-        for w in self.insertedList:
+        logging.debug("grid updated")
+        for w in iList:
+            logging.debug("for {} in insertedList".format(w))
             self.add_word_to_pos(w[0], w[1], w[2], w[3])
 
     def word_info(self, word):
@@ -248,8 +251,14 @@ class Grid(object):
                 logging.debug("Not good at {} {} {}".format(row, i, rev))
                 return False
 
+        # Не стоит ли слово уже?
         if self.is_on_board(word):
             logging.debug("{} is already set".format(word))
+            return False
+
+        # Не будет ли слово включено в какое-то другое?
+        if not self.is_dir_okay(word, row, col, rev):
+            logging.debug("dir for {} is not okay".format(word))
             return False
 
         logging.info('{} is placeable at {}, {} {}'.format(
@@ -258,15 +267,19 @@ class Grid(object):
 
     def creation(self, length=3):
         w = d.get_word(length, step=3)
+
         for i in range(0, len(self.grid)):
             for j in range(0, len(self.grid)):
                 logging.debug("{} {}".format(i, j))
+
                 if self.is_placeable(w, i, j, False):
-                    self.add_word_to_pos(w, i, j, False)
+                    self.add_word_to_inserted(w, i, j, False)
+                    self.update_grid()
 
 
 grid = Grid(config.file_to_list(config.rgridFilePath), logging.DEBUG)
 
-grid.creation(11)
+grid.creation(6)
+grid.creation(6)
 
 grid.show()
