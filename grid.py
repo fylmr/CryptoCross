@@ -2,6 +2,7 @@
 import config
 import words
 import logging
+import random
 
 d = words.Words()
 
@@ -62,10 +63,9 @@ class Grid(object):
 
     def update_grid(self):
         """Заново отрисовать сетку по insertedList"""
-        iList = self.insertedList[:]
-
         logging.debug("grid updated")
-        for w in iList:
+
+        for w in self.insertedList[:]:
             logging.debug("for {} in insertedList".format(w))
             self.add_word_to_pos(w[0], w[1], w[2], w[3])
 
@@ -195,6 +195,53 @@ class Grid(object):
             logging.debug("going through col #" + str(i))
         return i - col
 
+    def get_rulers(self):
+        """Вернёт список направляющих
+        в формате [направление, ряд, столбец]"""
+        logging.debug("get rulers")
+
+        res = []
+        for si in range(len(self.canvas)):
+            for sj in range(len(self.canvas)):
+                if self.canvas[si][sj] in ["0", "1", "2"]:
+                    res.append([self.canvas[si][sj], si, sj])
+        return res
+
+    def rulers_not_taken(self):
+        """Вернёт список направляющих, которые не заняты или неполностью заняты
+        в формете [направляющая, ряд, столбец, нужна горизонталь или вертикаль]
+        нужна горизонталь или вертикаль = 1 только для '2'"""
+        rulers = self.get_rulers()
+        res = []
+
+        for ruler in rulers:
+            ok = False
+            if ruler[0] == "0":
+                for word in self.insertedList:
+                    if word[3] is False:
+                        if word[1] == ruler[1] and word[2] == ruler[2]:
+                            ok = True
+                            break
+            elif ruler[1] == "1":
+                for word in self.insertedList:
+                    if word[3] is True:
+                        if word[1] == ruler[1] and word[2] == ruler[2]:
+                            ok = True
+                            break
+            elif ruler[1] == "2":
+                for word in self.insertedList:
+                    if word[3] is False:
+                        if word[1] == ruler[1] and word[2] == ruler[2]:
+                            ok = True
+                    if word[3] is True:
+                        if word[1] == ruler[1] and word[2] == ruler[2]:
+                            ok = True
+                            break
+                # ДОДЕЛАТЬ
+            if ok is not True:
+                res.append([ruler[0], ruler[1], ruler[2]])
+        return res
+
     def is_placeable(self, word, row, col, rev):
         """Можно ли разместить слово, начиная с этой позиции
 
@@ -265,7 +312,8 @@ class Grid(object):
             word, row, col, rev))
         return True
 
-    def creation(self, length=3):
+    def put_word_on_desk(self, length):
+        """Попробовать поставить слово на доску"""
         w = d.get_word(length, step=3)
 
         for i in range(0, len(self.grid)):
@@ -273,13 +321,26 @@ class Grid(object):
                 logging.debug("{} {}".format(i, j))
 
                 if self.is_placeable(w, i, j, False):
-                    self.add_word_to_inserted(w, i, j, False)
-                    self.update_grid()
+                    self.add_word_to_pos(w, i, j, False)
+                elif self.is_placeable(w, i, j, True):
+                    self.add_word_to_pos(w, i, j, True)
+
+    def creation(self, minLen=3, maxLen=11):
+        trynumber = 0
+        while True:
+            trynumber += 1
+
+            for i in reversed(range(minLen, maxLen)):
+                self.put_word_on_desk(i)
+            print("\n")
+            grid.show()
+
+            if trynumber > 300:
+                trynumber = 0
+                self.insertedList.pop()
 
 
-grid = Grid(config.file_to_list(config.rgridFilePath), logging.DEBUG)
+grid = Grid(config.file_to_list(config.rgridFilePath), logging.INFO)
 
-grid.creation(6)
-grid.creation(6)
-
+print(grid.get_rulers())
 grid.show()
