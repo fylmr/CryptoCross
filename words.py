@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import config
 import random
-import os
+import time
 
 
 class Words(object):
@@ -26,17 +26,15 @@ class Words(object):
 
         wordList = self.wordList
 
-        # a = list(range(1, len(wordList)))
-
-        # random.shuffle(a)
-        n = ord(os.urandom(1))
+        n = random.randint(0, len(wordList) - 1)
         while len(wordList[n]) != length:
             if len(wordList[n]) > length:
                 n += step
             else:
                 n -= step
             if n < 0 or n > len(wordList):
-                n = ord(os.urandom(1))
+                random.seed(round(time.time()))
+                n = random.randint(0, len(wordList) - 1)
 
         return wordList[n]
 

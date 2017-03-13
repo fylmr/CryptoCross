@@ -2,6 +2,7 @@
 import config
 import words
 import logging
+import codecs
 
 d = words.Words()
 
@@ -39,6 +40,19 @@ class Grid(object):
         for i in grid:
             print(i)
 
+    def save_grid_to_file(self, file=config.saveFile):
+        grid = self.grid
+
+        for i in range(len(grid)):
+            for j in range(len(grid)):
+                if grid[i][j] in ["_", "#", "0", "1", "2"]:
+                    grid[i] = grid[i][:j] + " " + grid[i][j + 1:]
+
+        with codecs.open(file, 'w', "utf_8_sig") as f:
+            for i in range(len(grid)):
+                f.write(grid[i])
+                f.write("\n")
+
     def cell(self, row, col):
         """Что стоит в клетке?"""
 
@@ -63,8 +77,9 @@ class Grid(object):
     def update_grid(self):
         """Заново отрисовать сетку по insertedList"""
         logging.debug("grid updated")
-
-        for w in self.insertedList[:]:
+        lst = self.insertedList[:]
+        self.insertedList = []
+        for w in lst:
             logging.debug("for {} in insertedList".format(w))
             self.add_word_to_pos(w[0], w[1], w[2], w[3])
 
@@ -156,7 +171,6 @@ class Grid(object):
         length = len(word)
 
         grid[row] = grid[row][:col] + word + grid[row][col + length:]
-        # Должна быть проверка, чтоб слово не выходило за пределы экрана
 
         if rev:
             self.grid = self.reverse(grid)
@@ -312,16 +326,15 @@ class Grid(object):
 
     def put_word_on_desk(self, length):
         """Попробовать поставить слово на доску"""
-        w = d.get_word(length, step=3)
+        w = d.get_word(length, step=47)
 
-        for i in range(0, len(self.grid)):
-            for j in range(0, len(self.grid)):
-                logging.debug("{} {}".format(i, j))
+        for ruler in self.rulers_not_taken():
+            logging.debug("{}".format(ruler))
 
-                if self.is_placeable(w, i, j, False):
-                    self.add_word_to_pos(w, i, j, False)
-                elif self.is_placeable(w, i, j, True):
-                    self.add_word_to_pos(w, i, j, True)
+            if self.is_placeable(w, ruler[1], ruler[2], False):
+                self.add_word_to_pos(w, ruler[1], ruler[2], False)
+            elif self.is_placeable(w, ruler[1], ruler[2], True):
+                self.add_word_to_pos(w, ruler[1], ruler[2], True)
 
     def creation(self, minLen=3, maxLen=11):
         trynumber = 0
@@ -331,11 +344,21 @@ class Grid(object):
             for i in reversed(range(minLen, maxLen)):
                 self.put_word_on_desk(i)
 
-            if trynumber > 50:
+            if trynumber > 500:
                 trynumber = 0
-                self.insertedList.pop()
+                self.insertedList.pop(0)
+                self.update_grid()
                 print("\n")
                 grid.show()
+                logging.info("RULERS TO GO: {}".format(
+                    - len(self.insertedList) + len(self.get_rulers())))
+
+                logging.info("SAVING")
+                self.save_grid_to_file()
+
+            if len(self.rulers_not_taken()) < 30:
+                grid.show()
+                exit()
 
 
 grid = Grid(config.file_to_list(config.rgridFilePath), logging.INFO)

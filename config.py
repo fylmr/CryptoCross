@@ -5,8 +5,10 @@ gridFilePath = "grid.txt"
 rgridFilePath = "rgrid.txt"
 
 listFilePath = "list.txt"
-sortedListFilePath = "listsorted.txt"
+sortedListFilePath = "listsorted(1).txt"
 dictFilePath = "dict.txt"
+
+saveFile = "save.txt"
 
 
 def file_to_list(path):
