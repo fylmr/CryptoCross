@@ -195,52 +195,41 @@ class Grid(object):
             logging.debug("going through col #" + str(i))
         return i - col
 
-    def get_rulers(self):
-        """Вернёт список направляющих
-        в формате [направление, ряд, столбец]"""
-        logging.debug("get rulers")
+    # def get_rulers(self):
+    #     """Вернёт список направляющих
+    #     в формате [направление, ряд, столбец]"""
+    #     logging.debug("get rulers")
 
-        res = []
-        for si in range(len(self.canvas)):
-            for sj in range(len(self.canvas)):
-                if self.canvas[si][sj] in ["0", "1", "2"]:
-                    res.append([self.canvas[si][sj], si, sj])
-        return res
+    #     res = []
+    #     for si in range(len(self.canvas)):
+    #         for sj in range(len(self.canvas)):
+    #             if self.canvas[si][sj] in ["0", "1", "2"]:
+    #                 res.append([self.canvas[si][sj], si, sj])
+    #     return res
 
-    def rulers_not_taken(self):
-        """Вернёт список направляющих, которые не заняты или неполностью заняты
-        в формете [направляющая, ряд, столбец, нужна горизонталь или вертикаль]
-        нужна горизонталь или вертикаль = 1 только для '2'"""
-        rulers = self.get_rulers()
-        res = []
+    def is_ruler_taken(self, row, col):
+        """Взята ли направляющая?"""
 
-        for ruler in rulers:
-            ok = False
-            if ruler[0] == "0":
-                for word in self.insertedList:
-                    if word[3] is False:
-                        if word[1] == ruler[1] and word[2] == ruler[2]:
-                            ok = True
-                            break
-            elif ruler[1] == "1":
-                for word in self.insertedList:
-                    if word[3] is True:
-                        if word[1] == ruler[1] and word[2] == ruler[2]:
-                            ok = True
-                            break
-            elif ruler[1] == "2":
-                for word in self.insertedList:
-                    if word[3] is False:
-                        if word[1] == ruler[1] and word[2] == ruler[2]:
-                            ok = True
-                    if word[3] is True:
-                        if word[1] == ruler[1] and word[2] == ruler[2]:
-                            ok = True
-                            break
-                # ДОДЕЛАТЬ
-            if ok is not True:
-                res.append([ruler[0], ruler[1], ruler[2]])
-        return res
+        cell = self.canvas[row][col]
+
+        if cell not in ["0", "1", "2"]:
+            return True
+
+        taken = 0
+        for word in self.insertedList:
+            if cell == "0":
+                if word[1] == row and word[2] == col and word[3] is False:
+                    return True
+            elif cell == "1":
+                if word[1] == row and word[2] == col and word[3] is True:
+                    return True
+            elif cell == "2":
+                if word[1] == row and word[2] == col:
+                    taken += 1
+                if taken > 1:
+                    return True
+
+        return False
 
     def is_placeable(self, word, row, col, rev):
         """Можно ли разместить слово, начиная с этой позиции
@@ -342,5 +331,4 @@ class Grid(object):
 
 grid = Grid(config.file_to_list(config.rgridFilePath), logging.INFO)
 
-print(grid.get_rulers())
-grid.show()
+grid.creation()

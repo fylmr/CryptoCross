@@ -10,7 +10,5 @@ get_rulers:
 Баги:
   ✔ Пробуя слово из трёх букв, оно суётся рандомно, не проверяя на count_free_space @done (17-03-08 00:57)
   ✔ Не проверена работа is_dir_okay @done (17-03-10 19:04)
-  ☐ Не проверена rulers_not_taken
+  ☐ Не проверена is_ruler_taken
 
-сreation_loop:
-   ☐ 60 раз?
