@@ -20,7 +20,7 @@ class Grid(object):
     def __init__(self, grid, verbose=logging.CRITICAL):
         super(Grid, self).__init__()
         self.grid = grid
-        self.canvas = grid
+        self.canvas = grid[:]
 
         logging.basicConfig(
             format=u'[%(lineno)d:%(levelname)s]: %(message)s',
@@ -132,7 +132,7 @@ class Grid(object):
                         logging.debug("row + len(word) > elem[1]")
                         return False
 
-        logging.info("dir okay for {}".format(word))
+        logging.debug("dir okay for {}".format(word))
         return True
 
     def add_word_to_pos(self, word, row, col, rev=False):
@@ -195,24 +195,26 @@ class Grid(object):
             logging.debug("going through col #" + str(i))
         return i - col
 
-    # def get_rulers(self):
-    #     """Вернёт список направляющих
-    #     в формате [направление, ряд, столбец]"""
-    #     logging.debug("get rulers")
+    def get_rulers(self):
+        """Вернёт список направляющих
+        в формате [направление, ряд, столбец]"""
+        logging.debug("get rulers")
 
-    #     res = []
-    #     for si in range(len(self.canvas)):
-    #         for sj in range(len(self.canvas)):
-    #             if self.canvas[si][sj] in ["0", "1", "2"]:
-    #                 res.append([self.canvas[si][sj], si, sj])
-    #     return res
+        res = []
+        for si in range(len(self.canvas)):
+            for sj in range(len(self.canvas)):
+                if self.canvas[si][sj] in ["0", "1", "2"]:
+                    res.append([self.canvas[si][sj], si, sj])
+        return res
 
     def is_ruler_taken(self, row, col):
         """Взята ли направляющая?"""
 
         cell = self.canvas[row][col]
 
+        logging.debug(cell)
         if cell not in ["0", "1", "2"]:
+            logging.debug("cell not in..")
             return True
 
         taken = 0
@@ -224,12 +226,20 @@ class Grid(object):
                 if word[1] == row and word[2] == col and word[3] is True:
                     return True
             elif cell == "2":
+                logging.debug("cell == 2")
                 if word[1] == row and word[2] == col:
                     taken += 1
                 if taken > 1:
                     return True
 
         return False
+
+    def rulers_not_taken(self):
+        res = []
+        for ruler in self.get_rulers():
+            if not self.is_ruler_taken(ruler[1], ruler[2]):
+                res.append(ruler)
+        return res
 
     def is_placeable(self, word, row, col, rev):
         """Можно ли разместить слово, начиная с этой позиции
@@ -301,32 +311,51 @@ class Grid(object):
             word, row, col, rev))
         return True
 
-    def put_word_on_desk(self, length):
+    def put_word_on_desk(self, length, i, j):
         """Попробовать поставить слово на доску"""
-        w = d.get_word(length, step=3)
+        w = d.get_word(length, step=1)
 
-        for i in range(0, len(self.grid)):
-            for j in range(0, len(self.grid)):
-                logging.debug("{} {}".format(i, j))
+        if self.is_ruler_taken(i, j):
+            return False
 
-                if self.is_placeable(w, i, j, False):
-                    self.add_word_to_pos(w, i, j, False)
-                elif self.is_placeable(w, i, j, True):
-                    self.add_word_to_pos(w, i, j, True)
+        if self.is_placeable(w, i, j, False):
+            self.add_word_to_pos(w, i, j, False)
+
+            grid.show()
+            print("\n")
+
+            return True
+        elif self.is_placeable(w, i, j, True):
+            self.add_word_to_pos(w, i, j, True)
+
+            grid.show()
+            print("\n")
+
+            return True
 
     def creation(self, minLen=3, maxLen=11):
         trynumber = 0
-        while True:
+
+        rulers = self.rulers_not_taken()
+
+        while len(rulers) > 0:
             trynumber += 1
 
-            for i in reversed(range(minLen, maxLen)):
-                self.put_word_on_desk(i)
-            print("\n")
-            grid.show()
+            i = random.randint(minLen, maxLen)
 
-            if trynumber > 300:
+            for ruler in rulers:
+                self.put_word_on_desk(i, ruler[1], ruler[2])
+
+            # logging.info("TRY: {}".format(trynumber))
+            if trynumber > 30:
                 trynumber = 0
-                self.insertedList.pop()
+
+                self.insertedList.pop(
+                    random.randint(0, len(self.insertedList)))
+                logging.info("pop")
+
+        logging.info("Finished.")
+        grid.show()
 
 
 grid = Grid(config.file_to_list(config.rgridFilePath), logging.INFO)
