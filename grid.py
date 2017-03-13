@@ -192,7 +192,7 @@ class Grid(object):
                     i += 1
                 else:
                     break
-            logging.debug("going through col #" + str(i))
+            # logging.debug("going through col #" + str(i))
         return i - col
 
     def get_rulers(self):
@@ -226,7 +226,7 @@ class Grid(object):
                 if word[1] == row and word[2] == col and word[3] is True:
                     return True
             elif cell == "2":
-                logging.debug("cell == 2")
+                # logging.debug("cell == 2")
                 if word[1] == row and word[2] == col:
                     taken += 1
                 if taken > 1:
@@ -315,8 +315,8 @@ class Grid(object):
         """Попробовать поставить слово на доску"""
         w = d.get_word(length, step=1)
 
-        if self.is_ruler_taken(i, j):
-            return False
+        # if self.is_ruler_taken(i, j):
+        #     return False
 
         if self.is_placeable(w, i, j, False):
             self.add_word_to_pos(w, i, j, False)
@@ -337,22 +337,26 @@ class Grid(object):
         trynumber = 0
 
         rulers = self.rulers_not_taken()
-
         while len(rulers) > 0:
             trynumber += 1
-
+            logging.info("TRY: {}".format(trynumber))
+            logging.info(len(rulers))
             i = random.randint(minLen, maxLen)
 
+            rulers = self.rulers_not_taken()
             for ruler in rulers:
+                logging.debug("ruler: {}".format(ruler))
                 self.put_word_on_desk(i, ruler[1], ruler[2])
 
             # logging.info("TRY: {}".format(trynumber))
-            if trynumber > 30:
+            if trynumber > 10:
+
                 trynumber = 0
 
                 self.insertedList.pop(
                     random.randint(0, len(self.insertedList)))
                 logging.info("pop")
+                self.update_grid()
 
         logging.info("Finished.")
         grid.show()
