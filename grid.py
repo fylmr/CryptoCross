@@ -2,7 +2,6 @@
 import config
 import words
 import logging
-import random
 
 d = words.Words()
 
@@ -212,7 +211,7 @@ class Grid(object):
 
         cell = self.canvas[row][col]
 
-        logging.debug(cell)
+        # logging.debug(cell)
         if cell not in ["0", "1", "2"]:
             logging.debug("cell not in..")
             return True
@@ -311,55 +310,32 @@ class Grid(object):
             word, row, col, rev))
         return True
 
-    def put_word_on_desk(self, length, i, j):
+    def put_word_on_desk(self, length):
         """Попробовать поставить слово на доску"""
-        w = d.get_word(length, step=1)
+        w = d.get_word(length, step=3)
 
-        # if self.is_ruler_taken(i, j):
-        #     return False
+        for i in range(0, len(self.grid)):
+            for j in range(0, len(self.grid)):
+                logging.debug("{} {}".format(i, j))
 
-        if self.is_placeable(w, i, j, False):
-            self.add_word_to_pos(w, i, j, False)
-
-            grid.show()
-            print("\n")
-
-            return True
-        elif self.is_placeable(w, i, j, True):
-            self.add_word_to_pos(w, i, j, True)
-
-            grid.show()
-            print("\n")
-
-            return True
+                if self.is_placeable(w, i, j, False):
+                    self.add_word_to_pos(w, i, j, False)
+                elif self.is_placeable(w, i, j, True):
+                    self.add_word_to_pos(w, i, j, True)
 
     def creation(self, minLen=3, maxLen=11):
         trynumber = 0
-
-        rulers = self.rulers_not_taken()
-        while len(rulers) > 0:
+        while True:
             trynumber += 1
-            logging.info("TRY: {}".format(trynumber))
-            logging.info(len(rulers))
-            i = random.randint(minLen, maxLen)
 
-            rulers = self.rulers_not_taken()
-            for ruler in rulers:
-                logging.debug("ruler: {}".format(ruler))
-                self.put_word_on_desk(i, ruler[1], ruler[2])
+            for i in reversed(range(minLen, maxLen)):
+                self.put_word_on_desk(i)
 
-            # logging.info("TRY: {}".format(trynumber))
-            if trynumber > 10:
-
+            if trynumber > 50:
                 trynumber = 0
-
-                self.insertedList.pop(
-                    random.randint(0, len(self.insertedList)))
-                logging.info("pop")
-                self.update_grid()
-
-        logging.info("Finished.")
-        grid.show()
+                self.insertedList.pop()
+                print("\n")
+                grid.show()
 
 
 grid = Grid(config.file_to_list(config.rgridFilePath), logging.INFO)

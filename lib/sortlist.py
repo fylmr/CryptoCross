@@ -5,7 +5,7 @@ import random
 
 res = []
 
-with codecs.open('list.txt', 'r', "utf_8_sig") as f:
+with codecs.open('listsorted.txt', 'r', "utf_8_sig") as f:
     res = f.readlines()
 
 res = list(res)
