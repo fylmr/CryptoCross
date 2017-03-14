@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 import codecs
 
-gridFilePath = "grid.txt"
-rgridFilePath = "rgrid.txt"
+gridPath = "grid.txt"
+rgridPath = "rgrid.txt"
 
-listFilePath = "list.txt"
-sortedListFilePath = "listsorted.txt"
-dictFilePath = "dict.txt"
+listPath = "list.txt"
+sortedListPath = "listsorted.txt"
 
 saveFile = "save.txt"
 

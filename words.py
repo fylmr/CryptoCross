@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
 import config
-import random
+import random as rd
 import time
 
 
@@ -9,68 +8,34 @@ class Words(object):
 
     def __init__(self):
         super(Words, self).__init__()
-        self.wordList = config.file_to_list(config.sortedListFilePath)
+        self.sortedList = config.file_to_list(config.sortedListPath)
+        self.List = config.file_to_list(config.listPath)
 
-    def get_word(self, length, step=1):
-        """Найти слово нужной длины
+    def get_word_len(self, length):
+        """Find word of needed length
 
         Parameters
         ----------
-        length: Желаемая длина
-        step=3: Шаг поиска
-
+        length
+        binary -- take first word (faster)
         Returns
         -------
-        word: Слово
+        word
         """
 
-        wordList = self.wordList
+        sortedList = self.sortedList
 
-        n = random.randint(0, len(wordList) - 1)
-        while len(wordList[n]) != length:
-            if len(wordList[n]) > length:
+        step = rd.randint(0, length) * round(time.time())
+        print(step)
+
+        n = rd.randint(0, len(sortedList) - 1)
+        print(n)
+        while len(sortedList[n]) != length:
+            if len(sortedList[n]) > length:
                 n += step
             else:
                 n -= step
-            if n < 0 or n > len(wordList):
-                random.seed(round(time.time()))
-                n = random.randint(0, len(wordList) - 1)
+            if n < 0 or n > len(sortedList):
+                n = rd.randint(0, len(sortedList) - 1)
 
-        return wordList[n]
-
-    def common_letters_words(self, word, rev=False):
-        """Вернёт список слов, с которыми есть пересечения в буквах,
-        в формате [слово, буква]
-
-        Parameters
-        ----------
-        word: Слово
-
-        Returns
-        -------
-        res: Список слов, с которыми есть пересечения
-            Формат: [слово, буква]
-        """
-
-        res = []
-        for w in self.insertedList:
-            for letter in word:
-                if letter in w[0]:
-                    # if w[3] != rev:
-                    #     res.append([w[0], letter])
-                    #     break
-                    res.append([w[0], letter])
-                    break
-        return res
-
-    def letter_positions(self, word, letter, once=False):
-        """Вернёт позиции, на которых данная буква находится в слове
-        """
-        res = []
-        for letPos in range(len(word)):
-            if word[letPos] == letter:
-                res.append(letPos)
-                if once:
-                    return letPos
-
-        return res
+        return sortedList[n]
