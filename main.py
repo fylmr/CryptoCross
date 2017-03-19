@@ -120,6 +120,8 @@ class Grid(object):
 
 
 os.system('cls')
+
 d = words.Words()
 grid = Grid(config.file_to_list(config.gridPath), logging.DEBUG)
+
 print(grid.mark_fragment(1, 1))
