@@ -2,6 +2,8 @@
 import config
 import words
 import logging
+import os
+import time
 
 
 class Grid(object):
@@ -73,6 +75,56 @@ class Grid(object):
 
         self.add_to_inserted(word, row, col, rev)
 
+    def plusable(self, grid, row, col):
+        if row >= 0 and row < len(grid):
+            if col >= 0 and col < len(grid):
+                if grid[row][col] == "_":
+                    grid[row] = grid[row][:col] + \
+                        "+" + grid[row][col + 1:]
+                    return True
+
+        return False
+
+    def fragment_square(self, row, col):
+        """Площадь фрагмента. Пускается из row, col"""
+        counter = 0
+        grid = self.grid
+
+        pluses = [[row, col]]
+
+        for plus in pluses:
+            # flaglen = len(pluses)
+            # print(flaglen)
+
+            if self.plusable(grid, plus[0] - 1, plus[1] - 1):
+                pluses.append([plus[0] - 1, plus[1] - 1])
+            if self.plusable(grid, plus[0] - 1, plus[1]):
+                pluses.append([plus[0] - 1, plus[1]])
+            if self.plusable(grid, plus[0] - 1, plus[1] + 1):
+                pluses.append([plus[0] - 1, plus[1] + 1])
+
+            if self.plusable(grid, plus[0], plus[1] - 1):
+                pluses.append([plus[0], plus[1] - 1])
+            if self.plusable(grid, plus[0], plus[1]):
+                pluses.append([plus[0], plus[1]])
+            if self.plusable(grid, plus[0], plus[1] + 1):
+                pluses.append([plus[0], plus[1] + 1])
+
+            if self.plusable(grid, plus[0] + 1, plus[1] - 1):
+                pluses.append([plus[0] + 1, plus[1] - 1])
+            if self.plusable(grid, plus[0] + 1, plus[1]):
+                pluses.append([plus[0] + 1, plus[1]])
+            if self.plusable(grid, plus[0] + 1, plus[1] + 1):
+                pluses.append([plus[0] + 1, plus[1] + 1])
+
+            os.system('cls')
+            self.show()
+            print("\n")
+            time.sleep(.5)
+
+        return counter
+
 
 d = words.Words()
-grid = Grid(config.file_to_list(config.gridPath), logging.INFO)
+grid = Grid(config.file_to_list(config.gridPath), logging.DEBUG)
+print(grid.fragment_square(1, 0))
