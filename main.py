@@ -78,53 +78,48 @@ class Grid(object):
     def plusable(self, grid, row, col):
         if row >= 0 and row < len(grid):
             if col >= 0 and col < len(grid):
-                if grid[row][col] == "_":
+                if grid[row][col] != "#":
                     grid[row] = grid[row][:col] + \
                         "+" + grid[row][col + 1:]
                     return True
 
         return False
 
-    def fragment_square(self, row, col):
+    def mark_fragment(self, row, col, get_pluses=False):
         """Площадь фрагмента. Пускается из row, col"""
-        counter = 0
-        grid = self.grid
+        grid = self.grid[:]
 
         pluses = [[row, col]]
+        checked = []
 
         for plus in pluses:
-            # flaglen = len(pluses)
-            # print(flaglen)
+            if plus in checked:
+                continue
+            for i in range(-1, 2):
+                for j in range(-1, 2):
+                    if i == j or i == -j:
+                        continue
+                    if self.plusable(grid, plus[0] + i, plus[1] + j):
+                        pluses.append([plus[0] + i, plus[1] + j])
+            checked.append(plus)
 
-            if self.plusable(grid, plus[0] - 1, plus[1] - 1):
-                pluses.append([plus[0] - 1, plus[1] - 1])
-            if self.plusable(grid, plus[0] - 1, plus[1]):
-                pluses.append([plus[0] - 1, plus[1]])
-            if self.plusable(grid, plus[0] - 1, plus[1] + 1):
-                pluses.append([plus[0] - 1, plus[1] + 1])
+            # os.system('cls')
+            # self.show()
+            # print("\n")
+            # time.sleep(.05)
 
-            if self.plusable(grid, plus[0], plus[1] - 1):
-                pluses.append([plus[0], plus[1] - 1])
-            if self.plusable(grid, plus[0], plus[1]):
-                pluses.append([plus[0], plus[1]])
-            if self.plusable(grid, plus[0], plus[1] + 1):
-                pluses.append([plus[0], plus[1] + 1])
+        pluses = []
+        for i in range(len(grid)):
+            for j in range(len(grid)):
+                if grid[i][j] == "+":
+                    pluses.append([i, j])
 
-            if self.plusable(grid, plus[0] + 1, plus[1] - 1):
-                pluses.append([plus[0] + 1, plus[1] - 1])
-            if self.plusable(grid, plus[0] + 1, plus[1]):
-                pluses.append([plus[0] + 1, plus[1]])
-            if self.plusable(grid, plus[0] + 1, plus[1] + 1):
-                pluses.append([plus[0] + 1, plus[1] + 1])
-
-            os.system('cls')
-            self.show()
-            print("\n")
-            time.sleep(.5)
-
-        return counter
+        if get_pluses:
+            return pluses
+        return len(pluses)
 
 
+os.system('cls')
 d = words.Words()
 grid = Grid(config.file_to_list(config.gridPath), logging.DEBUG)
-print(grid.fragment_square(1, 0))
+print(grid.mark_fragment(1, 1))
