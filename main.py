@@ -118,10 +118,20 @@ class Grid(object):
             return pluses
         return len(pluses)
 
+    def get_fragmented_rulers(self, row, col, get_length=False):
+        res = []
+        for f in self.mark_fragment(row, col, True):
+            if self.grid[f[0]][f[1]] in ['0', '1', '2']:
+                res.append(f)
+
+        if get_length:
+            return len(res)
+        return res
+
 
 os.system('cls')
 
 d = words.Words()
 grid = Grid(config.file_to_list(config.gridPath), logging.DEBUG)
 
-print(grid.mark_fragment(1, 1))
+print(grid.get_fragmented_rulers(1, 0))
