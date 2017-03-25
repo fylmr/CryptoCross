@@ -205,7 +205,7 @@ class Grid(object):
                     i += 1
                 else:
                     break
-            # logging.debug("going through col #" + str(i))
+
         return i - col
 
     def get_rulers(self):

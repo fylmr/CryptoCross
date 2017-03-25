@@ -1,6 +1,7 @@
 import config
 import random as rd
 import time
+import re
 
 
 class Words(object):
@@ -9,7 +10,7 @@ class Words(object):
     def __init__(self):
         super(Words, self).__init__()
         self.sortedList = config.file_to_list(config.sortedListPath)
-        self.List = config.file_to_list(config.listPath)
+        self.alphaList = config.file_to_list(config.listPath)
 
     def get_word_len(self, length):
         """Find word of needed length
@@ -39,3 +40,16 @@ class Words(object):
                 n = rd.randint(0, len(sortedList) - 1)
 
         return sortedList[n]
+
+    def get_word_regex(self, regex, many=False):
+        """Получить слово или несколько слов, которые
+        удовлетворяют регекспу"""
+        if many:
+            words = []
+        for word in self.alphaList:
+            if re.match(regex, word):
+                if not many:
+                    return word
+                words.append(word)
+        if many:
+            return words

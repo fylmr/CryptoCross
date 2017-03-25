@@ -75,6 +75,73 @@ class Grid(object):
 
         self.add_to_inserted(word, row, col, rev)
 
+    # def get_free_space(self, row, col, rev=False):
+    #     """Сколько, начиная с данной клетки,
+    #     места до границы или конца строки
+    #     """
+    #     logging.debug("count_free_space at {0} {1} {2}".format(row, col, rev))
+
+    #     if rev:
+    #         grid = self.reverse(self.grid)
+    #         row, col = col, row
+    #     else:
+    #         grid = self.grid
+
+    #     i = col
+    #     while i < len(grid):
+    #         if rev:
+    #             if grid[i][row] != "#":
+    #                 i += 1
+    #             else:
+    #                 break
+    #         else:
+    #             if grid[row][i] != "#":
+    #                 i += 1
+    #             else:
+    #                 break
+
+    #     return i - col
+
+    def make_regex(self, row, col, rev):
+        logging.debug("making regex at {} {} {}".format(row, col, rev))
+
+        regex = []
+        regex += "\\b"
+
+        if rev:
+            grid = self.reverse(self.grid)
+            row, col = col, row
+        else:
+            grid = self.grid
+
+        i = col
+        while i < len(grid):
+            if rev:
+                if grid[i][row] in ["_", "0", "1", "2"]:
+                    regex.append(".")
+                    logging.debug("row {} col {}".format(i, row))
+                elif grid[i][row] == "#":
+                    break
+                else:
+                    regex.append(grid[i][row])
+            else:
+                if grid[row][i] in ["_", "0", "1", "2"]:
+                    regex.append(".")
+                    logging.debug("row {} col {}".format(row, i))
+                elif grid[i][row] == "#":
+                    break
+                else:
+                    regex.append(grid[row][i])
+
+            i += 1
+
+        regex += "\\b"
+        return ''.join(regex)
+
+    def get_word_from_dict(self, row, col, rev, many=False):
+        regex = self.make_regex(row, col, rev)
+        return d.get_word_regex(regex, many)
+
     def plusable(self, grid, row, col):
         if row >= 0 and row < len(grid):
             if col >= 0 and col < len(grid):
@@ -118,7 +185,7 @@ class Grid(object):
             return pluses
         return len(pluses)
 
-    def get_fragment_depth(self, row, col, get_length=False):
+    def get_fragment(self, row, col, get_length=False):
         """Получить направляющие, лежащие во фрагменте"""
         res = []
         for f in self.mark_fragment(row, col, True):
@@ -135,4 +202,4 @@ os.system('cls')
 d = words.Words()
 grid = Grid(config.file_to_list(config.gridPath), logging.DEBUG)
 
-print(grid.get_fragment_depth(1, 0))
+print(grid.get_word_from_dict(1, 0, False, False))
