@@ -3,6 +3,7 @@ import config
 import words
 import logging
 import os
+import random
 import time
 
 
@@ -75,32 +76,10 @@ class Grid(object):
 
         self.add_to_inserted(word, row, col, rev)
 
-    # def get_free_space(self, row, col, rev=False):
-    #     """Сколько, начиная с данной клетки,
-    #     места до границы или конца строки
-    #     """
-    #     logging.debug("count_free_space at {0} {1} {2}".format(row, col, rev))
-
-    #     if rev:
-    #         grid = self.reverse(self.grid)
-    #         row, col = col, row
-    #     else:
-    #         grid = self.grid
-
-    #     i = col
-    #     while i < len(grid):
-    #         if rev:
-    #             if grid[i][row] != "#":
-    #                 i += 1
-    #             else:
-    #                 break
-    #         else:
-    #             if grid[row][i] != "#":
-    #                 i += 1
-    #             else:
-    #                 break
-
-    #     return i - col
+    def update_grid(self):
+        self.grid = self.canvas[:]
+        for word in self.insertedList:
+            self.place(word[0], word[1], word[2], word[3])
 
     def make_regex(self, row, col, rev):
         logging.debug("making regex at {} {} {}".format(row, col, rev))
@@ -119,7 +98,7 @@ class Grid(object):
             if rev:
                 if grid[i][row] in ["_", "0", "1", "2"]:
                     regex.append(".")
-                    logging.debug("row {} col {}".format(i, row))
+                    # logging.debug("row {} col {}".format(i, row))
                 elif grid[i][row] == "#":
                     break
                 else:
@@ -127,7 +106,7 @@ class Grid(object):
             else:
                 if grid[row][i] in ["_", "0", "1", "2"]:
                     regex.append(".")
-                    logging.debug("row {} col {}".format(row, i))
+                    # logging.debug("row {} col {}".format(row, i))
                 elif grid[i][row] == "#":
                     break
                 else:
@@ -138,9 +117,13 @@ class Grid(object):
         regex += "\\b"
         return ''.join(regex)
 
-    def get_word_from_dict(self, row, col, rev, many=False):
+    def get_word_from_dict(self, row, col, rev, one=False):
         regex = self.make_regex(row, col, rev)
-        return d.get_word_regex(regex, many)
+        words = d.get_word_regex(regex, True)
+        if not one:
+            return words
+        i = random.randint(0, len(words) - 1)
+        return words[i]
 
     def plusable(self, grid, row, col):
         if row >= 0 and row < len(grid):
@@ -202,4 +185,22 @@ os.system('cls')
 d = words.Words()
 grid = Grid(config.file_to_list(config.gridPath), logging.DEBUG)
 
-print(grid.get_word_from_dict(1, 0, False, False))
+rulers = grid.get_fragment(1, 0)
+for ruler in rulers:
+    try:
+        if grid.get_cell(ruler[0], ruler[1]) == '0':
+            word = grid.get_word_from_dict(ruler[0], ruler[1], False, True)
+            rev = False
+        elif grid.get_cell(ruler[0], ruler[1]) == '1':
+            word = grid.get_word_from_dict(ruler[0], ruler[1], True, True)
+            rev = True
+        else:
+            word = grid.get_word_from_dict(ruler[0], ruler[1], False, True)
+            rev = False
+        grid.place(word, ruler[0], ruler[1], rev)
+        grid.show()
+    except Exception as e:
+        # print(e)
+        # grid.insertedList.pop()
+        # grid.update_grid()
+        continue

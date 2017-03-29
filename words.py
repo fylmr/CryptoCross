@@ -18,7 +18,7 @@ class Words(object):
         Parameters
         ----------
         length
-        binary -- take first word (faster)
+
         Returns
         -------
         word
@@ -44,6 +44,7 @@ class Words(object):
     def get_word_regex(self, regex, many=False):
         """Получить слово или несколько слов, которые
         удовлетворяют регекспу"""
+
         if many:
             words = []
         for word in self.alphaList:
