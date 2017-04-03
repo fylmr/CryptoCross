@@ -49,14 +49,19 @@ class Grid(object):
         """Добавить слово в insertedList"""
         self.insertedList.append([word, row, col, rev])
 
-    def place(self, word, row, col, rev):
+    def place(self, word, row, col, rev, force=False):
         """Поставить слово на позицию. Изменяет сетку
 
         word: Слово
         row: Ряд
         col: Столбец
         rev: По вертикали?
+        force: ставить, даже если слово уже есть
         """
+        # if not force:
+        #     for listel in self.insertedList:
+        #         if word == listel[0]:
+        #             return False
 
         if rev:
             grid = self.reverse(self.grid)
@@ -125,14 +130,20 @@ class Grid(object):
         i = random.randint(0, len(words) - 1)
         return words[i]
 
-    def plusable(self, grid, row, col):
+    def plusable(self, grid, row, col, brute=True):
         if row >= 0 and row < len(grid):
             if col >= 0 and col < len(grid):
+                if brute:  # Проверить верх-низ или лево-право
+                    if row - 1 < 0 or grid[row - 1][col] == "#":
+                        if row + 1 == len(grid) or grid[row + 1][col] == "#":
+                            return False
+                    if col - 1 < 0 or grid[row][col - 1] == "#":
+                        if col + 1 == len(grid) or grid[row][col + 1] == "#":
+                            return False
                 if grid[row][col] != "#":
                     grid[row] = grid[row][:col] + \
                         "+" + grid[row][col + 1:]
                     return True
-
         return False
 
     def mark_fragment(self, row, col, get_pluses=False):
@@ -149,14 +160,9 @@ class Grid(object):
                 for j in range(-1, 2):
                     if i == j or i == -j:
                         continue
-                    if self.plusable(grid, plus[0] + i, plus[1] + j):
+                    if self.plusable(grid, plus[0] + i, plus[1] + j, True):
                         pluses.append([plus[0] + i, plus[1] + j])
             checked.append(plus)
-
-            # os.system('cls')
-            # self.show()
-            # print("\n")
-            # time.sleep(.05)
 
         pluses = []
         for i in range(len(grid)):
@@ -183,24 +189,9 @@ class Grid(object):
 os.system('cls')
 
 d = words.Words()
-grid = Grid(config.file_to_list(config.gridPath), logging.DEBUG)
+grid = Grid(config.file_to_list(config.gridPath), logging.INFO)
 
-rulers = grid.get_fragment(1, 0)
-for ruler in rulers:
-    try:
-        if grid.get_cell(ruler[0], ruler[1]) == '0':
-            word = grid.get_word_from_dict(ruler[0], ruler[1], False, True)
-            rev = False
-        elif grid.get_cell(ruler[0], ruler[1]) == '1':
-            word = grid.get_word_from_dict(ruler[0], ruler[1], True, True)
-            rev = True
-        else:
-            word = grid.get_word_from_dict(ruler[0], ruler[1], False, True)
-            rev = False
-        grid.place(word, ruler[0], ruler[1], rev)
-        grid.show()
-    except Exception as e:
-        # print(e)
-        # grid.insertedList.pop()
-        # grid.update_grid()
-        continue
+t0 = time.time()
+
+
+print("Finished in {}".format(-t0 + time.time()))
