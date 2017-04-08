@@ -199,6 +199,24 @@ fragments = [grid.get_fragment(0, 1),
              grid.get_fragment(8, 8)]
 
 
-pass
+for fragment in fragments:
+    for ruler in fragment:
+        try:
+            if grid.get_cell(ruler[0], ruler[1]) == '0':
+                word = grid.get_word_from_dict(ruler[0], ruler[1], False, True)
+                rev = False
+            elif grid.get_cell(ruler[0], ruler[1]) == '1':
+                word = grid.get_word_from_dict(ruler[0], ruler[1], True, True)
+                rev = True
+            else:
+                word = grid.get_word_from_dict(ruler[0], ruler[1], False, True)
+                rev = False
+            grid.place(word, ruler[0], ruler[1], rev)
+            grid.show()
+            print("\n")
+        except Exception as e:
+            print(e)
+            continue
+    break
 
 print("Finished in {}".format(-t0 + time.time()))
