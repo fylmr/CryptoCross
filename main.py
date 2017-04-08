@@ -193,5 +193,12 @@ grid = Grid(config.file_to_list(config.gridPath), logging.INFO)
 
 t0 = time.time()
 
+# Создаём массив фрагментов
+fragments = [grid.get_fragment(0, 1),
+             grid.get_fragment(0, 8),
+             grid.get_fragment(8, 8)]
+
+
+pass
 
 print("Finished in {}".format(-t0 + time.time()))
