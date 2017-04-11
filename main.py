@@ -90,8 +90,6 @@ class Grid(object):
         self.clear()
         for word in self.insertedList:
             self.place(word[0], word[1], word[2], word[3], True, True)
-        self.show()
-        print('showed')
 
     def make_regex(self, row, col, rev):
         logging.debug("making regex at {} {} {}".format(row, col, rev))
@@ -192,6 +190,22 @@ class Grid(object):
             return len(res)
         return res
 
+    def set_word(self, ruler):
+        if grid.get_cell(ruler[0], ruler[1]) == '0':
+            word = grid.get_word_from_dict(ruler[0], fragments[
+                                           fi][ri][1], False, True)
+            rev = False
+        elif grid.get_cell(ruler[0], ruler[1]) == '1':
+            word = grid.get_word_from_dict(
+                ruler[0], ruler[1], True, True)
+            rev = True
+        else:
+            word = grid.get_word_from_dict(ruler[0], ruler[1], False, True)
+            rev = False
+        grid.place(word, ruler[0], fragments[fi][ri][1], rev)
+        grid.show()
+        print("\n")
+
 
 os.system('cls')
 
@@ -206,32 +220,45 @@ fragments = [grid.get_fragment(0, 1),
              grid.get_fragment(8, 8)]
 
 
-for fragment in fragments:
-    for ruler in fragment:
+# for fragment in fragments:
+#     for ruler in fragment:
+#         try:
+#             if grid.get_cell(ruler[0], ruler[1]) == '0':
+#                 word = grid.get_word_from_dict(ruler[0], ruler[1], False, True)
+#                 rev = False
+#             elif grid.get_cell(ruler[0], ruler[1]) == '1':
+#                 word = grid.get_word_from_dict(ruler[0], ruler[1], True, True)
+#                 rev = True
+#             else:
+#                 word = grid.get_word_from_dict(ruler[0], ruler[1], False, True)
+#                 rev = False
+#             grid.place(word, ruler[0], ruler[1], rev)
+#             grid.show()
+#             print("\n")
+#         except Exception as e:
+#             print(e)
+
+#             grid.insertedList.pop()
+#             logging.info('poped')
+
+#             grid.update()
+#             logging.info('\nupdated')
+
+#             grid.show()
+#             continue
+#     # break
+
+for fi in range(len(fragments)):
+    for ri in range(len(fragments[fi])):
         try:
-            if grid.get_cell(ruler[0], ruler[1]) == '0':
-                word = grid.get_word_from_dict(ruler[0], ruler[1], False, True)
-                rev = False
-            elif grid.get_cell(ruler[0], ruler[1]) == '1':
-                word = grid.get_word_from_dict(ruler[0], ruler[1], True, True)
-                rev = True
-            else:
-                word = grid.get_word_from_dict(ruler[0], ruler[1], False, True)
-                rev = False
-            grid.place(word, ruler[0], ruler[1], rev)
-            grid.show()
-            print("\n")
+            grid.set_word(fragments[fi][ri])
         except Exception as e:
             print(e)
 
             grid.insertedList.pop()
-            logging.info('poped')
-
             grid.update()
-            logging.info('\nupdated')
-
-            grid.show()
             continue
     # break
+print(grid.insertedList)
 
 print("Finished in {}".format(-t0 + time.time()))
