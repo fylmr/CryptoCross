@@ -49,7 +49,7 @@ class Grid(object):
         """Добавить слово в insertedList"""
         self.insertedList.append([word, row, col, rev])
 
-    def place(self, word, row, col, rev, force=False):
+    def place(self, word, row, col, rev, force=False, noIns=False):
         """Поставить слово на позицию. Изменяет сетку
 
         word: Слово
@@ -58,10 +58,10 @@ class Grid(object):
         rev: По вертикали?
         force: ставить, даже если слово уже есть
         """
-        # if not force:
-        #     for listel in self.insertedList:
-        #         if word == listel[0]:
-        #             return False
+        if not force:
+            for listel in self.insertedList:
+                if word == listel[0]:
+                    return False
 
         if rev:
             grid = self.reverse(self.grid)
@@ -79,12 +79,19 @@ class Grid(object):
         else:
             self.grid = grid
 
-        self.add_to_inserted(word, row, col, rev)
+        if not noIns:
+            self.add_to_inserted(word, row, col, rev)
 
-    def update_grid(self):
-        self.grid = self.canvas[:]
+    def clear(self):
+        for i in range(len(self.grid)):
+            self.grid[i] = self.canvas[i]
+
+    def update(self):
+        self.clear()
         for word in self.insertedList:
-            self.place(word[0], word[1], word[2], word[3])
+            self.place(word[0], word[1], word[2], word[3], True, True)
+        self.show()
+        print('showed')
 
     def make_regex(self, row, col, rev):
         logging.debug("making regex at {} {} {}".format(row, col, rev))
@@ -216,7 +223,15 @@ for fragment in fragments:
             print("\n")
         except Exception as e:
             print(e)
+
+            grid.insertedList.pop()
+            logging.info('poped')
+
+            grid.update()
+            logging.info('\nupdated')
+
+            grid.show()
             continue
-    break
+    # break
 
 print("Finished in {}".format(-t0 + time.time()))
