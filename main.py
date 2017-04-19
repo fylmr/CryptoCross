@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-import config
-import words
 import logging
 import os
 import random
 import time
+
+import config
+import words
 
 
 class Grid(object):
@@ -30,6 +31,11 @@ class Grid(object):
             print(i)
 
     def get_cell(self, row, col, canvas=False):
+        """Получить клетку
+
+        row, col: ряд, строка
+        canvas: получить изначальную
+        """
         if canvas:
             return self.canvas[row][col]
         else:
@@ -184,25 +190,35 @@ class Grid(object):
         res = []
         for f in self.mark_fragment(row, col, True):
             if self.grid[f[0]][f[1]] in ['0', '1', '2']:
-                res.append(f)
+                r = f
+                r.append(self.grid[f[0]][f[1]])
+                res.append(r)
 
         if get_length:
             return len(res)
         return res
 
+    def normalize_fragment(self, fragment):
+        for i, ruler in enumerate(fragment):
+            polarity = ruler[2]
+            if polarity == '2':
+                fragment[i] = [ruler[0], ruler[1], '0']
+                fragment.append([ruler[0], ruler[1], '1'])
+        return fragment
+
     def set_word(self, ruler):
         if grid.get_cell(ruler[0], ruler[1]) == '0':
-            word = grid.get_word_from_dict(ruler[0], fragments[
-                                           fi][ri][1], False, True)
+            word = grid.get_word_from_dict(
+                ruler[0], ruler[1], False, True)
             rev = False
         elif grid.get_cell(ruler[0], ruler[1]) == '1':
             word = grid.get_word_from_dict(
                 ruler[0], ruler[1], True, True)
             rev = True
-        else:
-            word = grid.get_word_from_dict(ruler[0], ruler[1], False, True)
-            rev = False
-        grid.place(word, ruler[0], fragments[fi][ri][1], rev)
+        # else:
+        #     word = grid.get_word_from_dict(ruler[0], ruler[1], False, True)
+        #     rev = False
+        grid.place(word, ruler[0], ruler[1], rev)
         grid.show()
         print("\n")
 
@@ -219,19 +235,21 @@ fragments = [grid.get_fragment(0, 1),
              grid.get_fragment(0, 8),
              grid.get_fragment(8, 8)]
 
+print(grid.normalize_fragment(grid.get_fragment(0, 8)))
+print(grid.get_fragment(0, 8))
 
-# Работаем с фрагментами -> направляющими
-for fi in range(len(fragments)):
-    for ri in range(len(fragments[fi])):
-        try:
-            grid.set_word(fragments[fi][ri])
-        except Exception as e:
-            print(e)
+# # Работаем с фрагментами -> направляющими
+# for fi in range(len(fragments)):
+#     for ri in range(len(fragments[fi])):
+#         try:
+#             grid.set_word(fragments[fi][ri])
+#         except Exception as e:
+#             print(e)
 
-            grid.insertedList.pop()
-            grid.update()
-            continue
-    # break
-print(grid.insertedList)
+#             grid.insertedList.pop()
+#             grid.update()
+#             continue
+# # break
+# print(grid.insertedList)
 
 print("Finished in {}".format(-t0 + time.time()))
