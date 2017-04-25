@@ -44,8 +44,7 @@ class Grid(object):
     def reverse(self, grid):
         """Транспонировать матрицу (сетку)"""
 
-        gridRev = [[j[i] for j in grid]
-                   for i in range(len(grid))]
+        gridRev = [[j[i] for j in grid] for i in range(len(grid))]
         for i in range(len(gridRev)):
             gridRev[i] = ''.join(gridRev[i])
 
@@ -98,7 +97,7 @@ class Grid(object):
             self.place(word[0], word[1], word[2], word[3], True, True)
 
     def make_regex(self, row, col, rev):
-        logging.debug("making regex at {} {} {}".format(row, col, rev))
+        # logging.debug("making regex at {} {} {}".format(row, col, rev))
 
         regex = []
         regex += "\\b"
@@ -136,9 +135,15 @@ class Grid(object):
     def get_word_from_dict(self, row, col, rev, one=False):
         regex = self.make_regex(row, col, rev)
         words = d.get_word_regex(regex, True)
+
+        if len(words) < 1:
+            raise Warning("В словаре нет нужных слов")
+
         if not one:
             return words
+
         i = random.randint(0, len(words) - 1)
+        logging.debug(words[i])
         return words[i]
 
     def plusable(self, grid, row, col, brute=True):
@@ -207,26 +212,38 @@ class Grid(object):
         return fragment
 
     def set_word(self, ruler):
-        if grid.get_cell(ruler[0], ruler[1]) == '0':
-            word = grid.get_word_from_dict(
-                ruler[0], ruler[1], False, True)
-            rev = False
-        elif grid.get_cell(ruler[0], ruler[1]) == '1':
-            word = grid.get_word_from_dict(
-                ruler[0], ruler[1], True, True)
-            rev = True
-        # else:
-        #     word = grid.get_word_from_dict(ruler[0], ruler[1], False, True)
-        #     rev = False
+        logging.debug(str(ruler))
+
+        word = ''
+        try:
+            if self.grid[ruler[0]][ruler[1]] == '0':
+                word = self.get_word_from_dict(
+                    ruler[0], ruler[1], False, True)
+                logging.debug("word: " + word)
+                rev = False
+            elif self.grid[ruler[0]][ruler[1]] == '1':
+                word = self.get_word_from_dict(
+                    ruler[0], ruler[1], True, True)
+                logging.debug("word: " + word)
+                rev = True
+        except Warning as w:
+            logging.warning(w)
+            return False
+
+        if len(word) < 1:
+            # raise Warning("ok not good again")
+            return False
+
         grid.place(word, ruler[0], ruler[1], rev)
-        grid.show()
+
         print("\n")
+        return True
 
 
 os.system('cls')
 
 d = words.Words()
-grid = Grid(config.file_to_list(config.gridPath), logging.INFO)
+grid = Grid(config.file_to_list(config.gridPath), logging.DEBUG)
 
 t0 = time.time()
 
@@ -234,9 +251,26 @@ t0 = time.time()
 fragments = [grid.get_fragment(0, 1),
              grid.get_fragment(0, 8),
              grid.get_fragment(8, 8)]
+fragments = [grid.normalize_fragment(x) for x in fragments]
 
-print(grid.normalize_fragment(grid.get_fragment(0, 8)))
-print(grid.get_fragment(0, 8))
+
+for fragment in fragments:
+    fZero = len(fragment)
+    i = 0
+    checkedRulers = []
+    while len(checkedRulers) != fZero:
+        ruler = fragment[i]
+        if grid.set_word(ruler):
+            checkedRulers.append(ruler)
+            i += 1
+        else:
+            if len(grid.insertedList) > 0:
+                grid.insertedList.pop()
+            if len(checkedRulers) > 0:
+                checkedRulers.pop()
+
+
+print(checkedRulers)
 
 # # Работаем с фрагментами -> направляющими
 # for fi in range(len(fragments)):
@@ -250,6 +284,7 @@ print(grid.get_fragment(0, 8))
 #             grid.update()
 #             continue
 # # break
-# print(grid.insertedList)
+
+print(grid.insertedList)
 
 print("Finished in {}".format(-t0 + time.time()))
