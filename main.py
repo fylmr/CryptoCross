@@ -7,6 +7,8 @@ import time
 import config
 import words
 
+# random.seed(42)
+
 
 class Grid(object):
     """Работа с сеткой объекта"""
@@ -63,6 +65,11 @@ class Grid(object):
         rev: По вертикали?
         force: Ставить, даже если слово уже есть
         noIns: Не добавлять в инсертед лист
+
+        Returns:
+        False, если слово уже в списке, а force не выставлен
+        True, если всё ок
+
         """
         if not force:
             for listel in self.insertedList:
@@ -88,6 +95,8 @@ class Grid(object):
         if not noIns:
             self.add_to_inserted(word, row, col, rev)
 
+        return True
+
     def clear(self):
         for i in range(len(self.grid)):
             self.grid[i] = self.canvas[i]
@@ -98,7 +107,7 @@ class Grid(object):
             self.place(word[0], word[1], word[2], word[3], True, True)
 
     def make_regex(self, row, col, rev):
-        # logging.debug("making regex at {} {} {}".format(row, col, rev))
+        logging.debug("making regex at {} {} {}".format(row, col, rev))
 
         regex = []
         regex += "\\b"
@@ -111,31 +120,34 @@ class Grid(object):
 
         i = col
         while i < len(grid):
-            if rev:
-                if grid[i][row] in ["_", "0", "1", "2"]:
-                    regex.append(".")
-                    # logging.debug("row {} col {}".format(i, row))
-                elif grid[i][row] == "#":
-                    break
-                else:
-                    regex.append(grid[i][row])
+            # if rev:
+            #     if grid[i][row] in ["_", "0", "1", "2"]:
+            #         regex.append(".")
+            #         # logging.debug("row {} col {}".format(i, row))
+            #     elif grid[i][row] == "#":
+            #         break
+            #     else:
+            #         regex.append(grid[i][row])
+            # else:
+            if grid[row][i] in ["_", "0", "1", "2"]:
+                regex.append(".")
+                # logging.debug("row {} col {}".format(row, i))
+            elif grid[row][i] == "#":
+                break
             else:
-                if grid[row][i] in ["_", "0", "1", "2"]:
-                    regex.append(".")
-                    # logging.debug("row {} col {}".format(row, i))
-                elif grid[i][row] == "#":
-                    break
-                else:
-                    regex.append(grid[row][i])
+                regex.append(grid[row][i])
 
             i += 1
 
         regex += "\\b"
+
+        logging.debug("Regex made for {} {}".format(
+            [row, col, rev], ''.join(regex)))
         return ''.join(regex)
 
     def get_word_from_dict(self, row, col, rev, one=False):
         """
-        Получить слово из словаря по заданному месту. 
+        Получить слово из словаря по заданному месту.
         Вызовет Warning, если слова не найдётся
 
         row
@@ -238,7 +250,7 @@ class Grid(object):
             return False
 
         word = self.get_word_from_dict(row, col, pol, True)
-        self.place(word, row, col, pol, False)
+        self.place(word, row, col, pol, force=False)
 
         return True
 
@@ -257,8 +269,12 @@ fragments = [grid.get_fragment(0, 1),
 fragments = [grid.normalize_fragment(x) for x in fragments]
 
 # Основной код
-grid.set_word([1, 0, '0'])
-grid.show()
+for fragment in fragments:
+    for ruler in fragment:
+        grid.set_word(ruler)
+        grid.show()
+        print(grid.insertedList)
+        print("\n")
 
 print(grid.insertedList)
 
