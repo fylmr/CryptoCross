@@ -61,7 +61,8 @@ class Grid(object):
         row: Ряд
         col: Столбец
         rev: По вертикали?
-        force: ставить, даже если слово уже есть
+        force: Ставить, даже если слово уже есть
+        noIns: Не добавлять в инсертед лист
         """
         if not force:
             for listel in self.insertedList:
@@ -133,6 +134,18 @@ class Grid(object):
         return ''.join(regex)
 
     def get_word_from_dict(self, row, col, rev, one=False):
+        """
+        Получить слово из словаря по заданному месту. 
+        Вызовет Warning, если слова не найдётся
+
+        row
+        col
+        rev
+        one
+
+        Returns:
+        Одно слово или список слов
+        """
         regex = self.make_regex(row, col, rev)
         words = d.get_word_regex(regex, True)
 
@@ -211,6 +224,24 @@ class Grid(object):
                 fragment.append([ruler[0], ruler[1], '1'])
         return fragment
 
+    def set_word(self, ruler):
+        row = ruler[0]
+        col = ruler[1]
+        pol = ruler[2]
+
+        if pol == '0':
+            pol = False
+        elif pol == '1':
+            pol = True
+        else:
+            raise ValueError("Unexpected polarity")
+            return False
+
+        word = self.get_word_from_dict(row, col, pol, True)
+        self.place(word, row, col, pol, False)
+
+        return True
+
 
 os.system('cls')
 
@@ -225,6 +256,9 @@ fragments = [grid.get_fragment(0, 1),
              grid.get_fragment(8, 8)]
 fragments = [grid.normalize_fragment(x) for x in fragments]
 
+# Основной код
+grid.set_word([1, 0, '0'])
+grid.show()
 
 print(grid.insertedList)
 
