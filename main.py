@@ -211,34 +211,6 @@ class Grid(object):
                 fragment.append([ruler[0], ruler[1], '1'])
         return fragment
 
-    def set_word(self, ruler):
-        logging.debug(str(ruler))
-
-        word = ''
-        try:
-            if self.grid[ruler[0]][ruler[1]] == '0':
-                word = self.get_word_from_dict(
-                    ruler[0], ruler[1], False, True)
-                logging.debug("word: " + word)
-                rev = False
-            elif self.grid[ruler[0]][ruler[1]] == '1':
-                word = self.get_word_from_dict(
-                    ruler[0], ruler[1], True, True)
-                logging.debug("word: " + word)
-                rev = True
-        except Warning as w:
-            logging.warning(w)
-            return False
-
-        if len(word) < 1:
-            # raise Warning("ok not good again")
-            return False
-
-        grid.place(word, ruler[0], ruler[1], rev)
-
-        print("\n")
-        return True
-
 
 os.system('cls')
 
@@ -253,37 +225,6 @@ fragments = [grid.get_fragment(0, 1),
              grid.get_fragment(8, 8)]
 fragments = [grid.normalize_fragment(x) for x in fragments]
 
-
-for fragment in fragments:
-    fZero = len(fragment)
-    i = 0
-    checkedRulers = []
-    while len(checkedRulers) != fZero:
-        ruler = fragment[i]
-        if grid.set_word(ruler):
-            checkedRulers.append(ruler)
-            i += 1
-        else:
-            if len(grid.insertedList) > 0:
-                grid.insertedList.pop()
-            if len(checkedRulers) > 0:
-                checkedRulers.pop()
-
-
-print(checkedRulers)
-
-# # Работаем с фрагментами -> направляющими
-# for fi in range(len(fragments)):
-#     for ri in range(len(fragments[fi])):
-#         try:
-#             grid.set_word(fragments[fi][ri])
-#         except Exception as e:
-#             print(e)
-
-#             grid.insertedList.pop()
-#             grid.update()
-#             continue
-# # break
 
 print(grid.insertedList)
 
