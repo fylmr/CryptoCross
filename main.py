@@ -267,15 +267,55 @@ fragments = [grid.get_fragment(0, 1),
              grid.get_fragment(0, 8),
              grid.get_fragment(8, 8)]
 fragments = [grid.normalize_fragment(x) for x in fragments]
+allrulers = fragments[0] + fragments[1] + fragments[2]
+
+# checked = []
 
 # Основной код
-for fragment in fragments:
-    for ruler in fragment:
+# for fragment in fragments:
+#     i = random.randint(0, len(fragment))
+#     while len(fragment) > 1:
+#         i = random.randint(0, len(fragment))
+#         ruler = fragment[i]
+#         try:
+#             grid.set_word(ruler)
+#             grid.show()
+#             print(grid.insertedList)
+#             print("\n")
+#         except:
+#             logging.error("No word can be placed here")
+#             grid.insertedList.pop()
+#             grid.update()
+#             grid.show()
+
+while True:
+    i = random.randint(0, len(allrulers) - 1)
+    print(i, len(allrulers))
+    ruler = allrulers[i]
+    # Ставим слово
+    try:
+        # Если нашлось нужное слово, добавляем в инсертед лист
         grid.set_word(ruler)
         grid.show()
-        print(grid.insertedList)
-        print("\n")
+        allrulers.pop(i)
+        logging.debug("Ruler {} set, allrulers is {}".format(
+            ruler, len(allrulers)))
+    except:
+        # Если нет, удаляем из инсертед лист и копируем обратно в allrulers
+        p = grid.insertedList.pop()
+        if p[3] is True:
+            allrulers.append([p[1], p[2], "1"])
+        else:
+            allrulers.append([p[1], p[2], "0"])
+        grid.update()
+        grid.show()
+        logging.debug("Ruler {} appended".format(p))
+    # Заканчиваем, когда all rulers обнулился
+    if len(allrulers) < 1:
+        break
 
+print("\n-----------\n")
+grid.show()
 print(grid.insertedList)
 
 print("Finished in {}".format(-t0 + time.time()))
