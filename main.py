@@ -70,7 +70,7 @@ class Grid(object):
         False, если слово уже в списке, а force не выставлен
         True, если всё ок
 
-        """
+        """ 
         if not force:
             for listel in self.insertedList:
                 if word == listel[0]:
@@ -107,7 +107,7 @@ class Grid(object):
             self.place(word[0], word[1], word[2], word[3], True, True)
 
     def make_regex(self, row, col, rev):
-        logging.debug("making regex at {} {} {}".format(row, col, rev))
+        # logging.debug("making regex at {} {} {}".format(row, col, rev))
 
         regex = []
         regex += "\\b"
@@ -120,15 +120,7 @@ class Grid(object):
 
         i = col
         while i < len(grid):
-            # if rev:
-            #     if grid[i][row] in ["_", "0", "1", "2"]:
-            #         regex.append(".")
-            #         # logging.debug("row {} col {}".format(i, row))
-            #     elif grid[i][row] == "#":
-            #         break
-            #     else:
-            #         regex.append(grid[i][row])
-            # else:
+
             if grid[row][i] in ["_", "0", "1", "2"]:
                 regex.append(".")
                 # logging.debug("row {} col {}".format(row, i))
@@ -141,8 +133,8 @@ class Grid(object):
 
         regex += "\\b"
 
-        logging.debug("Regex made for {} {}".format(
-            [row, col, rev], ''.join(regex)))
+        # logging.debug("Regex made for {} {}".format(
+        # [row, col, rev], ''.join(regex)))
         return ''.join(regex)
 
     def get_word_from_dict(self, row, col, rev, one=False):
@@ -268,29 +260,13 @@ fragments = [grid.get_fragment(0, 1),
              grid.get_fragment(8, 8)]
 fragments = [grid.normalize_fragment(x) for x in fragments]
 allrulers = fragments[0] + fragments[1] + fragments[2]
-
+print(len(allrulers))
 # checked = []
 
 # Основной код
-# for fragment in fragments:
-#     i = random.randint(0, len(fragment))
-#     while len(fragment) > 1:
-#         i = random.randint(0, len(fragment))
-#         ruler = fragment[i]
-#         try:
-#             grid.set_word(ruler)
-#             grid.show()
-#             print(grid.insertedList)
-#             print("\n")
-#         except:
-#             logging.error("No word can be placed here")
-#             grid.insertedList.pop()
-#             grid.update()
-#             grid.show()
 
 while True:
     i = random.randint(0, len(allrulers) - 1)
-    print(i, len(allrulers))
     ruler = allrulers[i]
     # Ставим слово
     try:
@@ -298,7 +274,7 @@ while True:
         grid.set_word(ruler)
         grid.show()
         allrulers.pop(i)
-        logging.debug("Ruler {} set, allrulers is {}".format(
+        logging.debug("Ruler {} removed, allrulers' len {}".format(
             ruler, len(allrulers)))
     except:
         # Если нет, удаляем из инсертед лист и копируем обратно в allrulers
@@ -310,6 +286,8 @@ while True:
         grid.update()
         grid.show()
         logging.debug("Ruler {} appended".format(p))
+    print("Lasted {0:.2f}s, {1} rulers left".format(-t0 +
+                                                    time.time(), len(allrulers)))
     # Заканчиваем, когда all rulers обнулился
     if len(allrulers) < 1:
         break
