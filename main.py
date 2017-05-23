@@ -3,6 +3,7 @@ import logging
 import os
 import random
 import time
+import winsound
 
 import config
 import words
@@ -70,7 +71,7 @@ class Grid(object):
         False, если слово уже в списке, а force не выставлен
         True, если всё ок
 
-        """ 
+        """
         if not force:
             for listel in self.insertedList:
                 if word == listel[0]:
@@ -193,7 +194,7 @@ class Grid(object):
                 for j in range(-1, 2):
                     if i == j or i == -j:
                         continue
-                    if self.plusable(grid, plus[0] + i, plus[1] + j, True):
+                    if self.plusable(grid, plus[0] + i, plus[1] + j, False):
                         pluses.append([plus[0] + i, plus[1] + j])
             checked.append(plus)
 
@@ -255,16 +256,16 @@ grid = Grid(config.file_to_list(config.gridPath), logging.DEBUG)
 t0 = time.time()
 
 # Создаём массив фрагментов
-fragments = [grid.get_fragment(0, 1),
-             grid.get_fragment(0, 8),
-             grid.get_fragment(8, 8)]
+fragments = [grid.get_fragment(7, 7)]
+#  grid.get_fragment(0, 8),
+#  grid.get_fragment(8, 8)]
 fragments = [grid.normalize_fragment(x) for x in fragments]
-allrulers = fragments[0] + fragments[1] + fragments[2]
+allrulers = fragments[0][:]  # + fragments[1] + fragments[2]
 print(len(allrulers))
 # checked = []
 
 # Основной код
-
+print(allrulers)
 while True:
     i = random.randint(0, len(allrulers) - 1)
     ruler = allrulers[i]
@@ -276,6 +277,8 @@ while True:
         allrulers.pop(i)
         logging.debug("Ruler {} removed, allrulers' len {}".format(
             ruler, len(allrulers)))
+    except KeyboardInterrupt:
+        input()
     except:
         # Если нет, удаляем из инсертед лист и копируем обратно в allrulers
         p = grid.insertedList.pop()
@@ -288,9 +291,19 @@ while True:
         logging.debug("Ruler {} appended".format(p))
     print("Lasted {0:.2f}s, {1} rulers left".format(-t0 +
                                                     time.time(), len(allrulers)))
+
+    print("\n")
+    # config.save_grid_to_file(grid=grid.grid)
+
     # Заканчиваем, когда all rulers обнулился
     if len(allrulers) < 1:
         break
+    if len(allrulers) == 2:
+        Freq = 2500  # Set Frequency To 2500 Hertz
+        Dur = 1000  # Set Duration To 1000 ms == 1 second
+        winsound.Beep(Freq, Dur)
+        print(allrulers)
+        input()
 
 print("\n-----------\n")
 grid.show()
