@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import codecs
 
-gridPath = "grid.txt"
+gridPath = "grid_1.txt"
 rgridPath = "rgrid.txt"
 
 listPath = "list.txt"

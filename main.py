@@ -70,7 +70,7 @@ class Grid(object):
         False, если слово уже в списке, а force не выставлен
         True, если всё ок
 
-        """ 
+        """
         if not force:
             for listel in self.insertedList:
                 if word == listel[0]:
@@ -193,7 +193,7 @@ class Grid(object):
                 for j in range(-1, 2):
                     if i == j or i == -j:
                         continue
-                    if self.plusable(grid, plus[0] + i, plus[1] + j, True):
+                    if self.plusable(grid, plus[0] + i, plus[1] + j, False):
                         pluses.append([plus[0] + i, plus[1] + j])
             checked.append(plus)
 
@@ -255,11 +255,11 @@ grid = Grid(config.file_to_list(config.gridPath), logging.DEBUG)
 t0 = time.time()
 
 # Создаём массив фрагментов
-fragments = [grid.get_fragment(0, 1),
-             grid.get_fragment(0, 8),
-             grid.get_fragment(8, 8)]
+fragments = [grid.get_fragment(0, 1)]
+#  grid.get_fragment(0, 8),
+#  grid.get_fragment(8, 8)]
 fragments = [grid.normalize_fragment(x) for x in fragments]
-allrulers = fragments[0] + fragments[1] + fragments[2]
+allrulers = fragments[0][:]  # + fragments[1] + fragments[2]
 print(len(allrulers))
 # checked = []
 
@@ -276,6 +276,9 @@ while True:
         allrulers.pop(i)
         logging.debug("Ruler {} removed, allrulers' len {}".format(
             ruler, len(allrulers)))
+    except KeyboardInterrupt:
+        print("PAUSE. PRESS ANY KEY TO CONTINUE OR CTRL+C TO EXIT.")
+        input()
     except:
         # Если нет, удаляем из инсертед лист и копируем обратно в allrulers
         p = grid.insertedList.pop()
@@ -291,6 +294,8 @@ while True:
     # Заканчиваем, когда all rulers обнулился
     if len(allrulers) < 1:
         break
+    if len(allrulers) == 1:
+        input()
 
 print("\n-----------\n")
 grid.show()
