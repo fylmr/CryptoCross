@@ -3,6 +3,7 @@ import logging
 import os
 import random
 import time
+import sys
 
 import config
 import words
@@ -256,16 +257,15 @@ t0 = time.time()
 
 # Создаём массив фрагментов
 fragments = [grid.get_fragment(0, 1)]
-#  grid.get_fragment(0, 8),
-#  grid.get_fragment(8, 8)]
 fragments = [grid.normalize_fragment(x) for x in fragments]
-allrulers = fragments[0][:]  # + fragments[1] + fragments[2]
+allrulers = fragments[0]
 print(len(allrulers))
-# checked = []
 
 # Основной код
-
-config.save(grid.grid, grid.insertedList)
+if len(sys.argv) > 1:
+    left = int(sys.argv[1])
+    right = int(sys.argv[2])
+    allrulers = allrulers[left:right]
 
 while True:
     i = random.randint(0, len(allrulers) - 1)
@@ -279,7 +279,7 @@ while True:
         logging.debug("Ruler {} removed, allrulers' len {}".format(
             ruler, len(allrulers)))
     except KeyboardInterrupt:
-        print("PAUSE. PRESS ANY KEY TO CONTINUE OR CTRL+C TO EXIT.")
+        print("ПАУЗА. Нажмите Enter, чтоб продолжить, или CTRL+C, чтобы выйти.")
         config.save(grid.grid, grid.insertedList)
         input()
     except:
@@ -297,8 +297,8 @@ while True:
     # Заканчиваем, когда all rulers обнулился
     if len(allrulers) < 1:
         break
-    if len(allrulers) == 1:
-        input()
+    # if len(allrulers) == 1:
+    #     input()
 
 print("\n-----------\n")
 grid.show()

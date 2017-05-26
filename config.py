@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 import codecs
+import os.path
 
-gridPath = "grid_1.txt"
+gridPath = "grid.txt"
 rgridPath = "rgrid.txt"
 
 listPath = "list.txt"
 sortedListPath = "listsorted.txt"
 
-saveFile = "save.txt"
+saveFile = "save"
 
 
 def file_to_list(path):
@@ -37,7 +38,10 @@ def strings_to_file(*strings):
 
 
 def save(grid, insertedList):
-    with open(saveFile, "w") as f:
+    i = 0
+    while os.path.isfile(saveFile + str(i) + ".txt"):
+        i += 1
+    with open(saveFile + str(i) + ".txt", "w") as f:
         for line in grid:
             for symbol in line:
                 if symbol in ["0", "1", "2"]:
