@@ -265,6 +265,8 @@ print(len(allrulers))
 
 # Основной код
 
+config.save(grid.grid, grid.insertedList)
+
 while True:
     i = random.randint(0, len(allrulers) - 1)
     ruler = allrulers[i]
@@ -278,6 +280,7 @@ while True:
             ruler, len(allrulers)))
     except KeyboardInterrupt:
         print("PAUSE. PRESS ANY KEY TO CONTINUE OR CTRL+C TO EXIT.")
+        config.save(grid.grid, grid.insertedList)
         input()
     except:
         # Если нет, удаляем из инсертед лист и копируем обратно в allrulers
